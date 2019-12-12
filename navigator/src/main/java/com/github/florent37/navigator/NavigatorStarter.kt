@@ -23,6 +23,8 @@ class NavigatorStarter(private val context: Context, private val routing: Map<Ro
             } ?: run {
                 throw MissingIntentThrowable(routeName = route.name)
             }
+        } else {
+            throw MissingIntentThrowable(routeName = route.name)
         }
         return containRoute
     }

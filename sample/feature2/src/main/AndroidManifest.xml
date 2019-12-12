@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.florent37.feature2">
+
+    <application>
+        <activity android:name=".Feature2Activity"/>
+
+        <provider
+            android:authorities="${applicationId}.feature2.RouteProvider"
+            android:name=".RouteProvider"/>
+    </application>
+
+</manifest>

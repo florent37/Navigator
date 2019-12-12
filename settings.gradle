@@ -1,2 +1,2 @@
-include ':app', ':navigator'
-rootProject.name='Navigator'
+include ':navigator', ':sample:app', ':sample:feature1', ':sample:feature2', ':sample:routing'
+rootProject.name = 'Navigator'
