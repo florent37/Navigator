@@ -34,8 +34,8 @@ abstract class Parametizable(val name: String) {
         this._parametersValues[param.name] = block(bundle, this.name)
     }
 
-    inline fun <reified T> parameter(name: String, optional: Boolean = false): ParameterDescription<T> {
-        return ParameterDescription(name = name, optional = optional, theClass = T::class.java)
+    inline fun <reified T> parameter(name: String): ParameterDescription<T> {
+        return ParameterDescription(name = name, optional = null is T, theClass = T::class.java)
             .also { addParameter(it) }
     }
 }
