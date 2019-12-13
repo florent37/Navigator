@@ -1,7 +1,10 @@
 package com.github.florent37.navigator
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
+import androidx.fragment.app.Fragment
 
 typealias INTENT_CREATOR = Context.() -> Intent
 
@@ -12,5 +15,7 @@ object Navigator {
         routing[route] = creator
     }
 
-    fun of(context: Context) = NavigatorStarter(context, routing.toMap())
+    fun of(application: Application) = NavigatorStarter(StarterHandler.ApplicationStarter(application), routing.toMap())
+    fun of(activity: Activity) = NavigatorStarter(StarterHandler.ActivityStarter(activity), routing.toMap())
+    fun of(fragment: Fragment) = NavigatorStarter(StarterHandler.FragmentStarter(fragment), routing.toMap())
 }
