@@ -3,19 +3,17 @@ package com.github.florent37.routing
 import com.github.florent37.navigator.Route
 
 object Routes {
-    object Feature1 : Route("/feature1") {
-        val UserName = parameter<String?>("name")
 
-        object Flavor1 : Flavor<Feature1>(this, "/tab1") {
-            val arg0 = parameter<String?>("arg0")
-        }
+    object Splash : Route("/")
 
-        object SubFeatureTab2 : Flavor<Feature1>(this, "/tab2")
+    object Home : Route("/home/") {
+        object UserTabs : Flavor<Home>(this,"$name/tabUsers")
+        object PostsTabs : Flavor<Home>(this,"$name/tabPosts")
+
+        object Settings : Route("$name/settings")
     }
 
-
-    object Feature2 : Route("/feature2") {
-        val UserName = parameter<String>("name")
-        val UserAge = parameter<Int>("age")
+    object User : Route("${Home.UserTabs.name}/user") {
+        val userId = parameter<String>("userId")
     }
 }

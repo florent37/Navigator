@@ -1,2 +1,7 @@
-include ':navigator', ':sample:app', ':sample:feature1', ':sample:feature2', ':sample:routing'
+include ':navigator',
+        ':sample:app',
+        ':sample:splash',
+        ':sample:home',
+        ':sample:user',
+        ':sample:routing'
 rootProject.name = 'Navigator'

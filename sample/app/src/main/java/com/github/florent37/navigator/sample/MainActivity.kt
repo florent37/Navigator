@@ -11,10 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Navigator.of(this).start(Routes.Feature1.Flavor1) {
-            parameterValue(route.UserName) { "florent" }
-            parameterValue(arg0) { "arg0" }
-        }
+        Navigator.of(this).start(Routes.Splash)
 
         finish()
     }

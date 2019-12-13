@@ -76,6 +76,8 @@ open class Route(
     }
 }
 
+fun <R : Route> R.flavor(name: String) = Route.Flavor(this, name)
+
 fun Parametizable.generateCall(parameters: List<Pair<String, Any?>>): RouteCall {
     return RouteCall(
         parameterizable = this,

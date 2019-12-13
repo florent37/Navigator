@@ -54,26 +54,29 @@ sealed class StarterHandler {
 
 }
 
+typealias IntentConfig = (Intent) -> Unit
 
 class NavigatorStarter(
     private val starterHandler: StarterHandler,
     private val routing: Map<Route, INTENT_CREATOR>
 ) {
-    fun <T : Route> start(route: T, arguments: (T.() -> Unit)? = null): Boolean {
-        return this.startInternal(route = route, resultCode = null, arguments = arguments)
+    fun <T : Route> start(route: T, intentConfig: IntentConfig? = null, arguments: (T.() -> Unit)? = null): Boolean {
+        return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig, arguments = arguments)
     }
 
     fun <T : Route> startForResult(
         route: T,
         resultCode: Int,
+        intentConfig: IntentConfig? = null,
         arguments: (T.() -> Unit)? = null
     ): Boolean {
-        return this.startInternal(route = route, resultCode = resultCode, arguments = arguments)
+        return this.startInternal(route = route, resultCode = resultCode, intentConfig = intentConfig, arguments = arguments)
     }
 
     private fun <T : Route> startInternal(
         route: T,
         resultCode: Int? = null,
+        intentConfig: IntentConfig? = null,
         arguments: (T.() -> Unit)? = null
     ): Boolean {
         val containRoute = routing.containsKey(route)
@@ -99,6 +102,8 @@ class NavigatorStarter(
 
                 intent.putExtras(extras)
 
+                intentConfig?.invoke(intent)
+
                 if (resultCode == null) {
                     starterHandler.start(intent)
                 } else {
@@ -116,11 +121,13 @@ class NavigatorStarter(
 
     fun <T : Route.Flavor<*>> start(
         routeConfiguration: T,
+        intentConfig: IntentConfig? = null,
         arguments: (T.() -> Unit)? = null
     ): Boolean {
         return this.startInternal(
             routeConfiguration = routeConfiguration,
             resultCode = null,
+            intentConfig = intentConfig,
             arguments = arguments
         )
     }
@@ -128,11 +135,13 @@ class NavigatorStarter(
     fun <T : Route.Flavor<*>> startForResult(
         route: T,
         resultCode: Int,
+        intentConfig: IntentConfig? = null,
         arguments: (T.() -> Unit)? = null
     ): Boolean {
         return this.startInternal(
             routeConfiguration = route,
             resultCode = resultCode,
+            intentConfig = intentConfig,
             arguments = arguments
         )
     }
@@ -140,6 +149,7 @@ class NavigatorStarter(
     private fun <T : Route.Flavor<*>> startInternal(
         routeConfiguration: T,
         resultCode: Int? = null,
+        intentConfig: IntentConfig? = null,
         arguments: (T.() -> Unit)? = null
     ): Boolean {
 
@@ -171,6 +181,8 @@ class NavigatorStarter(
                 val intent: Intent = it(context)
 
                 intent.putExtras(extras)
+
+                intentConfig?.invoke(intent)
 
                 if (resultCode == null) {
                     starterHandler.start(intent)
