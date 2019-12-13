@@ -8,7 +8,7 @@ import com.github.florent37.routing.Routes
 /* Called at startup */
 class RouteProvider : Provider() {
     override fun provide() {
-        Navigator.registerRoute(Routes.Feature1) {
+        Routes.Feature1.register {
             Intent(context, Feature1Activity::class.java)
         }
     }

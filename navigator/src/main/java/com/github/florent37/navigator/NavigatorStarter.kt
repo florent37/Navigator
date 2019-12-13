@@ -50,41 +50,129 @@ sealed class StarterHandler {
             //not possible for just a context
             context.startActivity(intent)
         }
-
     }
 
 }
 
 
-
-
-class NavigatorStarter(private val starterHandler: StarterHandler, private val routing: Map<Route, INTENT_CREATOR>) {
-    fun <T : Route> start(route: T, bloc: T.() -> Unit): Boolean {
-        return this.startInternal(route= route, resultCode = null, bloc = bloc)
+class NavigatorStarter(
+    private val starterHandler: StarterHandler,
+    private val routing: Map<Route, INTENT_CREATOR>
+) {
+    fun <T : Route> start(route: T, arguments: (T.() -> Unit)? = null): Boolean {
+        return this.startInternal(route = route, resultCode = null, arguments = arguments)
     }
 
-    fun <T : Route> startForResult(route: T, resultCode: Int, bloc: T.() -> Unit): Boolean {
-        return this.startInternal(route= route, resultCode = resultCode, bloc = bloc)
+    fun <T : Route> startForResult(
+        route: T,
+        resultCode: Int,
+        arguments: (T.() -> Unit)? = null
+    ): Boolean {
+        return this.startInternal(route = route, resultCode = resultCode, arguments = arguments)
     }
 
-    fun <T : Route> startInternal(route: T, resultCode: Int? = null, bloc: T.() -> Unit): Boolean {
+    private fun <T : Route> startInternal(
+        route: T,
+        resultCode: Int? = null,
+        arguments: (T.() -> Unit)? = null
+    ): Boolean {
         val containRoute = routing.containsKey(route)
         val context = starterHandler.context ?: return false
         if (containRoute) {
             val intentCreator = routing[route]
             intentCreator?.let {
 
-                route.clearParametersValues()
-                bloc(route)
-                val params = route.parametersValues
+                val routeParams = route.let {
+                    it.clearParametersValues()
+                    arguments?.invoke(it) //generate arguments
+                    return@let it.parametersValues
+                }
 
                 route.ensureAllRequiredParametersAreFilled()
 
-                val routeCall = route.generateCall(params.toList())
-                val args = routeCall.toBundle()
-                val intent = it(context).putExtras(args)
+                val routeCall = route.generateCall(routeParams.toList())
+                val extras = routeCall.toBundle()
 
-                if(resultCode == null) {
+                val intent: Intent = it(context)
+
+                extras.putString(ROUTE_INTENT_KEY, route.name)
+
+                intent.putExtras(extras)
+
+                if (resultCode == null) {
+                    starterHandler.start(intent)
+                } else {
+                    starterHandler.startForResult(intent, resultCode)
+                }
+            } ?: run {
+                throw MissingIntentThrowable(routeName = route.name)
+            }
+        } else {
+            throw MissingIntentThrowable(routeName = route.name)
+        }
+        return containRoute
+    }
+
+
+    fun <T : Route.Flavor<*>> start(
+        routeConfiguration: T,
+        arguments: (T.() -> Unit)? = null
+    ): Boolean {
+        return this.startInternal(
+            routeConfiguration = routeConfiguration,
+            resultCode = null,
+            arguments = arguments
+        )
+    }
+
+    fun <T : Route.Flavor<*>> startForResult(
+        route: T,
+        resultCode: Int,
+        arguments: (T.() -> Unit)? = null
+    ): Boolean {
+        return this.startInternal(
+            routeConfiguration = route,
+            resultCode = resultCode,
+            arguments = arguments
+        )
+    }
+
+    private fun <T : Route.Flavor<*>> startInternal(
+        routeConfiguration: T,
+        resultCode: Int? = null,
+        arguments: (T.() -> Unit)? = null
+    ): Boolean {
+
+        val route = routeConfiguration.route
+
+        val containRoute = routing.containsKey(route)
+        val context = starterHandler.context ?: return false
+        if (containRoute) {
+            val intentCreator = routing[route]
+            intentCreator?.let {
+
+                val routeParams = routeConfiguration.let {
+                    it.clearParametersValues()
+                    arguments?.invoke(it) //generate arguments
+                    return@let it.parametersValues
+                }
+
+                routeConfiguration.ensureAllRequiredParametersAreFilled()
+
+                val routeCall = route.generateCall(routeParams.toList())
+                val routeConfigCall = routeConfiguration.generateCall(routeParams.toList())
+
+                val extras = routeCall.toBundle()
+                extras.putAll(routeConfigCall.toBundle())
+
+                extras.putString(ROUTE_INTENT_KEY, route.name)
+                extras.putString(SUB_ROUTE_INTENT_KEY, routeConfiguration.name)
+
+                val intent: Intent = it(context)
+
+                intent.putExtras(extras)
+
+                if (resultCode == null) {
                     starterHandler.start(intent)
                 } else {
                     starterHandler.startForResult(intent, resultCode)

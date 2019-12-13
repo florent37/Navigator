@@ -5,11 +5,10 @@ import android.os.Parcelable
 import com.github.florent37.navigator.exceptions.MissingArgumentsThrowable
 import java.io.Serializable
 
-class RouteCall(val route: Route, val parameters: Map<String, Any?>) {
-
+class RouteCall(val parameterizable: Parametizable, val parameters: Map<String, Any?>) {
     fun toBundle(): Bundle {
         val bundle = Bundle()
-        val requiredParameters = this.route.parameters
+        val requiredParameters = this.parameterizable.parameters
         requiredParameters.forEach {
             val parameterName = it.name
             val value: Any? = this.parameters[parameterName]
