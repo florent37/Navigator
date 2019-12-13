@@ -25,7 +25,7 @@ sealed class StarterHandler {
 
     }
 
-    class FragmentStarter(val fragment: Fragment) : StarterHandler {
+    class FragmentStarter(val fragment: Fragment) : StarterHandler() {
         override val context = fragment.context
 
         override fun start(intent: Intent) {
@@ -48,7 +48,7 @@ sealed class StarterHandler {
 
         override fun startForResult(intent: Intent, code: Int) {
             //not possible for just a context
-            //context.startActivityForResult(intent, code)
+            context.startActivity(intent)
         }
 
     }
@@ -60,6 +60,14 @@ sealed class StarterHandler {
 
 class NavigatorStarter(private val starterHandler: StarterHandler, private val routing: Map<Route, INTENT_CREATOR>) {
     fun <T : Route> start(route: T, bloc: T.() -> Unit): Boolean {
+        return this.startInternal(route= route, resultCode = null, bloc = bloc)
+    }
+
+    fun <T : Route> startForResult(route: T, resultCode: Int, bloc: T.() -> Unit): Boolean {
+        return this.startInternal(route= route, resultCode = resultCode, bloc = bloc)
+    }
+
+    fun <T : Route> startInternal(route: T, resultCode: Int? = null, bloc: T.() -> Unit): Boolean {
         val containRoute = routing.containsKey(route)
         val context = starterHandler.context ?: return false
         if (containRoute) {
@@ -75,7 +83,12 @@ class NavigatorStarter(private val starterHandler: StarterHandler, private val r
                 val routeCall = route.generateCall(params.toList())
                 val args = routeCall.toBundle()
                 val intent = it(context).putExtras(args)
-                starterHandler.start(intent)
+
+                if(resultCode == null) {
+                    starterHandler.start(intent)
+                } else {
+                    starterHandler.startForResult(intent, resultCode)
+                }
             } ?: run {
                 throw MissingIntentThrowable(routeName = route.name)
             }
