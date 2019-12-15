@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/tabUsers" android:title="users"/>
-    <item android:id="@+id/tabPosts" android:title="posts"/>
+    <item android:id="@+id/tabUsers" android:title="users" android:icon="@drawable/ic_account_circle_black_24dp"/>
+    <item android:id="@+id/tabPosts" android:title="posts" android:icon="@drawable/ic_folder_black_24dp"/>
 </menu>

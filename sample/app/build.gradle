@@ -25,11 +25,14 @@ android {
 dependencies {
     implementation project(":sample:routing")
     implementation project(':sample:splash')
+    implementation project(':sample:user')
     implementation project(':sample:home')
     implementation project(":navigator")
     implementation 'com.github.florent37:applicationprovider:1.0.1'
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.koin:koin-android:$koin_version"
+    implementation "org.koin:koin-android-viewmodel:$koin_version"
+
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.2'

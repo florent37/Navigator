@@ -1,6 +1,7 @@
 package com.github.florent37.navigator
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import com.github.florent37.navigator.exceptions.MissingArgumentsThrowable
@@ -40,12 +41,21 @@ abstract class Parametizable(val name: String) {
     }
 }
 
+typealias INTENT_PARAMETER = (Intent) -> Unit
+
 open class Route(
     name: String
 ) : Parametizable(name) {
 
     fun register(creator: INTENT_CREATOR) {
         Navigator.registerRoute(this, creator)
+    }
+
+
+    inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
+        register {
+            Intent(this, T::class.java).also { intentParameter?.invoke(it) }
+        }
     }
 
     open class Flavor<R : Route>(val route: R, name: String) : Parametizable(name) {

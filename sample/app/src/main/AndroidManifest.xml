@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="${applicationId}.KoinProvider"
+            android:name=".KoinProvider"
+            android:initOrder="999"/>
     </application>
 
 </manifest>

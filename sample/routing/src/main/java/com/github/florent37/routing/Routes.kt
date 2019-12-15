@@ -13,7 +13,7 @@ object Routes {
         object Settings : Route("$name/settings")
     }
 
-    object User : Route("${Home.UserTabs.name}/user") {
-        val userId = parameter<String>("userId")
+    object User : Route("${Home.name}/user") {
+        val userId = parameter<Int>("userId")
     }
 }

@@ -8,6 +8,10 @@
         <provider
             android:authorities="${applicationId}.user.RouteProvider"
             android:name=".RouteProvider"/>
+
+        <provider
+            android:authorities="${applicationId}.user.DependenciesProvider"
+            android:name=".DependenciesProvider"/>
     </application>
 
 </manifest>
