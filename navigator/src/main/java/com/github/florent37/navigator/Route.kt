@@ -17,19 +17,39 @@ typealias INTENT_PARAMETER = (Intent) -> Unit
 
 open class RouteParameter : Serializable
 
-abstract class AbstractRoute(
+interface Destination {
     val name: String
-) {
+}
+
+abstract class AbstractRoute(
+    override val name: String
+) : Destination {
+
+    inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
+        Navigator.registerRoute(this) { context ->
+            Intent(context, T::class.java).also { intentParameter?.invoke(it) }
+        }
+    }
 
     abstract class AbstractFlavor<R : AbstractRoute>(
         val route: R,
-        val name: String
-    )
+        override val name: String
+    ) : Destination {
+        inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
+            Navigator.registerRoute(this) { context ->
+                Intent(context, T::class.java).also { intentParameter?.invoke(it) }
+            }
+        }
+    }
 
     abstract class Flavor<R : AbstractRoute>(
         route: R,
         name: String
-    ) : AbstractFlavor<R>(route, name)
+    ) : AbstractFlavor<R>(route, name) {
+        fun register(creator: INTENT_CREATOR) {
+            Navigator.registerRoute(this, creator)
+        }
+    }
 
     abstract class FlavorWithParams<R : AbstractRoute, P: RouteParameter>(
         route: R,
@@ -41,24 +61,28 @@ open class Route(name: String) : AbstractRoute(name) {
     fun register(creator: INTENT_CREATOR) {
         Navigator.registerRoute(this, creator)
     }
-
-    inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
-        register {
-            Intent(this, T::class.java).also { intentParameter?.invoke(it) }
-        }
-    }
 }
 open class RouteWithParams<P : RouteParameter>(name: String) : AbstractRoute(name) {
 
     fun register(creator: (Context, P) -> Intent) {
         Navigator.registerRoute(this, creator)
     }
+}
 
-    inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
-        register { context, parameters ->
-            Intent(context, T::class.java).also { intentParameter?.invoke(it) }
-        }
+fun <R: Route, P : RouteParameter> AbstractRoute.FlavorWithParams<R, P>.register(creator: (Context, P) -> Intent) {
+    Navigator.registerRoute(this, creator)
+}
+
+inline fun <reified T : Activity, R: Route, P : RouteParameter> AbstractRoute.FlavorWithParams<R, P>.registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
+    register {  context, param ->
+        Intent(context, T::class.java).also { intentParameter?.invoke(it) }
     }
+}
+
+fun <RP: RouteParameter, R: RouteWithParams<RP>, P : RouteParameter> AbstractRoute.FlavorWithParams<R, P>.register(
+    creator: (Context, routeParams: RP, flavorParams: P) -> Intent
+) {
+    Navigator.registerRoute(this, creator)
 }
 
 fun <C : AbstractRoute.AbstractFlavor<*>> Activity.invokeOnRouteFlavor(

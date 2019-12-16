@@ -59,7 +59,7 @@ typealias IntentConfig = (Intent) -> Unit
 
 class NavigatorStarter(
     private val starterHandler: StarterHandler,
-    private val routing: Map<AbstractRoute, Routing>
+    private val routing: Map<Destination, Routing>
 ) {
     fun <T : Route> start(route: T, intentConfig: IntentConfig? = null): Boolean {
         return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig)
