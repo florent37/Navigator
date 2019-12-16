@@ -1,4 +1,4 @@
-package com.github.florent37.home.tabs.users
+package com.github.florent37.home.tabs.posts
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.github.florent37.home.R
-import com.github.florent37.user.core.User
-import kotlinx.android.synthetic.main.cell_user.view.*
+import com.github.florent37.post.core.Post
+import kotlinx.android.synthetic.main.cell_post.view.*
 
-typealias UserClickListener = (User) -> Unit
+typealias PostClickListener = (Post) -> Unit
 
-class UsersAdapter(val listener: UserClickListener) : RecyclerView.Adapter<UserViewHolder>() {
+class PostsAdapter(val listener: PostClickListener) : RecyclerView.Adapter<UserViewHolder>() {
 
-    var items = listOf<User>()
+    var items = listOf<Post>()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -30,29 +30,28 @@ class UsersAdapter(val listener: UserClickListener) : RecyclerView.Adapter<UserV
 
 class UserViewHolder(
     view: View,
-    val listener: UserClickListener
+    val listener: PostClickListener
 ) : RecyclerView.ViewHolder(view) {
 
     companion object {
         fun newInstance(
             parent: ViewGroup,
-            listener: UserClickListener
+            listener: PostClickListener
         ) = LayoutInflater.from(parent.context).inflate(R.layout.cell_user, parent, false).let {
             UserViewHolder(it, listener)
         }
     }
 
-    private var user: User? = null
+    private var post: Post? = null
 
     init {
         itemView.setOnClickListener {
-            user?.let(listener)
+            post?.let(listener)
         }
     }
 
-    fun bind(user: User) {
-        this.user = user
-        itemView.userName.text = user.name
-        Glide.with(itemView.context).load(user.avatarUrl).into(itemView.userImage)
+    fun bind(post: Post) {
+        this.post = post
+        itemView.text.text = post.text
     }
 }

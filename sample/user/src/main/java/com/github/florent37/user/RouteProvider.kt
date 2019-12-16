@@ -7,7 +7,7 @@ import com.github.florent37.routing.Routes
 /* Called at startup */
 class RouteProvider : Provider() {
     override fun provide() {
-        Routes.User.register {
+        Routes.User.register { context, params ->
             Intent(context, UserActivity::class.java)
         }
     }

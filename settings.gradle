@@ -4,5 +4,6 @@ include ':navigator',
         ':sample:home',
         ':sample:user',
         ':sample:user-core',
+        ':sample:post-core',
         ':sample:routing'
 rootProject.name = 'Navigator'

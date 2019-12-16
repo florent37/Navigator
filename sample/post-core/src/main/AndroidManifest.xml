@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.florent37.post.core" >
+
+    <application>
+        <provider
+            android:authorities="${applicationId}.user.core.DependenciesProvider"
+            android:name=".DependenciesProvider"/>
+    </application>
+
+</manifest>
