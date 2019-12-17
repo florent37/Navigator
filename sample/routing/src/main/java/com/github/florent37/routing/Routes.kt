@@ -12,7 +12,6 @@ object Routes {
         object UserTabs : Flavor<Home>(this,"$name/tabUsers")
 
         object PostsTabs : FlavorWithParams<Home, PostsTabs.Params>(this,"$name/tabPosts") {
-
             class Params(val userId: Int?) : RouteParameter()
         }
 
