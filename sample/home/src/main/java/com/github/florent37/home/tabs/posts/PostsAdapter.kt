@@ -4,16 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.github.florent37.home.R
-import com.github.florent37.post.core.Post
 import kotlinx.android.synthetic.main.cell_post.view.*
 
-typealias PostClickListener = (Post) -> Unit
+typealias RecyclerItem = PostWithUser
+typealias PostClickListener = (RecyclerItem) -> Unit
 
 class PostsAdapter(val listener: PostClickListener) : RecyclerView.Adapter<UserViewHolder>() {
 
-    var items = listOf<Post>()
+    var items = listOf<RecyclerItem>()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -37,21 +36,22 @@ class UserViewHolder(
         fun newInstance(
             parent: ViewGroup,
             listener: PostClickListener
-        ) = LayoutInflater.from(parent.context).inflate(R.layout.cell_user, parent, false).let {
+        ) = LayoutInflater.from(parent.context).inflate(R.layout.cell_post, parent, false).let {
             UserViewHolder(it, listener)
         }
     }
 
-    private var post: Post? = null
+    private var item: RecyclerItem? = null
 
     init {
         itemView.setOnClickListener {
-            post?.let(listener)
+            item?.let(listener)
         }
     }
 
-    fun bind(post: Post) {
-        this.post = post
-        itemView.text.text = post.text
+    fun bind(item: RecyclerItem) {
+        this.item = item
+        itemView.author.text = item.author?.name ?: ""
+        itemView.text.text = item.post.text
     }
 }

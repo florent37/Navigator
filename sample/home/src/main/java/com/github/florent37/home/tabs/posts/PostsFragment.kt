@@ -4,23 +4,34 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.florent37.home.R
+import com.github.florent37.navigator.optionalFlavorParameter
 import com.github.florent37.navigator.optionalParameter
 import com.github.florent37.navigator.parameter
 import com.github.florent37.routing.Routes
+import kotlinx.android.synthetic.main.fragment_posts.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class PostsFragment : Fragment(R.layout.fragment_posts) {
 
-    private var args by optionalParameter<Routes.Home.PostsTabs.Params>()
+    private var args by optionalFlavorParameter<Routes.Home.PostsTabs.Params>()
 
     private val viewHolder : PostsViewModel by viewModel()
+    private lateinit var adapter : PostsAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewHolder.viewState.observe(viewLifecycleOwner, Observer {
+        adapter = PostsAdapter(listener = {
 
+        })
+        postsRecycler.adapter = adapter
+        postsRecycler.layoutManager = LinearLayoutManager(context)
+
+        viewHolder.viewState.observe(viewLifecycleOwner, Observer {
+            adapter.items = it.posts
+            headerText.text = it.headerText
         })
 
         viewHolder.loadPosts(args?.userId)

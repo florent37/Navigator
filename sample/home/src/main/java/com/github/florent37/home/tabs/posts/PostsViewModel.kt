@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class ViewState(val posts: List<PostWithUser>)
+class ViewState(val headerText: String?, val posts: List<PostWithUser>)
 
 class PostsViewModel(private val useCase: PostsUseCase) : ViewModel() {
 
@@ -15,9 +15,13 @@ class PostsViewModel(private val useCase: PostsUseCase) : ViewModel() {
 
     fun loadPosts(ofUser: Int? = null) {
         viewModelScope.launch {
+            val posts = useCase.getPosts(ofUser)
+            val author = if(ofUser != null) posts.getOrNull(0)?.author  else null
+            val headerText = author?.let { "Posts of ${it.name}" } ?: "All posts"
             _viewState.postValue(
                 ViewState(
-                    useCase.getPosts(ofUser)
+                    headerText = headerText,
+                    posts = posts
                 )
             )
         }

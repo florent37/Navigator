@@ -11,8 +11,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Navigator.of(this).push(Routes.Splash)
-
-        finish()
+        Navigator.of(this).pushReplacement(Routes.Splash)
     }
 }

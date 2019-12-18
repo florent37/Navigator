@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import com.github.florent37.application.provider.ActivityProvider
 
 sealed class StarterHandler {
     abstract val context: Context?
@@ -42,15 +43,23 @@ sealed class StarterHandler {
     class ApplicationStarter(val application: Application) : StarterHandler() {
 
         override val context = application
-        override val activity: Activity? = null //TODO
+        override val activity: Activity? = ActivityProvider.currentActivity
 
         override fun start(intent: Intent) {
-            application.startActivity(intent)
+            activity?.let {
+                it.startActivity(intent)
+            } ?: run {
+                application.startActivity(intent)
+            }
         }
 
         override fun startForResult(intent: Intent, code: Int) {
-            //not possible for just a context
-            context.startActivity(intent)
+            activity?.let {
+                it.startActivityForResult(intent, code)
+            } ?: run {
+                //not possible to startForResult without an activity context
+                application.startActivity(intent)
+            }
         }
     }
 
