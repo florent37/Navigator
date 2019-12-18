@@ -15,8 +15,7 @@ class SplashActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         launch {
             delay(4 * 1000)
 
-            Navigator.of(this@SplashActivity).push(Routes.Home)
-            finish()
+            Navigator.current()?.pushReplacement(Routes.Home)
         }
     }
 

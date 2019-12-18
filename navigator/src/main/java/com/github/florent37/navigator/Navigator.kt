@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import com.github.florent37.application.provider.ActivityProvider
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
 
@@ -67,6 +68,15 @@ object Navigator {
             ),
             routing.toMap()
         )
+
+    fun current() : NavigatorStarter? = ActivityProvider.currentActivity?.let { activity ->
+        NavigatorStarter(
+            StarterHandler.ActivityStarter(
+                activity
+            ),
+            routing.toMap()
+        )
+    }
 
     fun findRoute(name: String) : Destination? {
         routing.forEach {

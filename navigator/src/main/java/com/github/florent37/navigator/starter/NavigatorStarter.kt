@@ -1,6 +1,5 @@
 package com.github.florent37.navigator.starter
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.github.florent37.navigator.*
