@@ -1,59 +1,10 @@
-package com.github.florent37.navigator
+package com.github.florent37.navigator.starter
 
 import android.app.Activity
-import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import com.github.florent37.navigator.*
 import com.github.florent37.navigator.exceptions.MissingIntentThrowable
-
-sealed class StarterHandler {
-    abstract val context: Context?
-    abstract fun start(intent: Intent)
-    abstract fun startForResult(intent: Intent, code: Int)
-
-    class ActivityStarter(val activity: Activity) : StarterHandler() {
-        override val context = activity
-
-        override fun start(intent: Intent) {
-            activity.startActivity(intent)
-        }
-
-        override fun startForResult(intent: Intent, code: Int) {
-            activity.startActivityForResult(intent, code)
-        }
-
-    }
-
-    class FragmentStarter(val fragment: Fragment) : StarterHandler() {
-        override val context = fragment.context
-
-        override fun start(intent: Intent) {
-            fragment.startActivity(intent)
-        }
-
-        override fun startForResult(intent: Intent, code: Int) {
-            fragment.startActivityForResult(intent, code)
-        }
-
-    }
-
-    class ApplicationStarter(val application: Application) : StarterHandler() {
-
-        override val context = application
-
-        override fun start(intent: Intent) {
-            application.startActivity(intent)
-        }
-
-        override fun startForResult(intent: Intent, code: Int) {
-            //not possible for just a context
-            context.startActivity(intent)
-        }
-    }
-
-}
 
 typealias IntentConfig = (Intent) -> Unit
 
@@ -61,36 +12,84 @@ class NavigatorStarter(
     private val starterHandler: StarterHandler,
     private val routing: Map<Destination, Routing>
 ) {
-    fun <T : Route> start(route: T, intentConfig: IntentConfig? = null): Boolean {
+    fun <T : Route> push(route: T, intentConfig: IntentConfig? = null): Boolean {
         return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig)
     }
 
-    fun <P: RouteParameter, T : RouteWithParams<P>> start(route: T, arguments: P, intentConfig: IntentConfig? = null): Boolean {
-        return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig, routeParameter = arguments)
+    fun <T : Route> pushReplacement(route: T, intentConfig: IntentConfig? = null): Boolean {
+        return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig, finishActivity= true)
     }
 
-    fun <T : Route> startForResult(
+    fun pop(resultCode: Int, data: Intent?) {
+        starterHandler.activity?.let {
+            it.setResult(resultCode, data)
+            it.finish()
+        }
+    }
+
+    fun <P : Parameter, T : RouteWithParams<P>> push(
+        route: T,
+        arguments: P,
+        intentConfig: IntentConfig? = null
+    ): Boolean {
+        return this.startInternal(
+            route = route,
+            resultCode = null,
+            intentConfig = intentConfig,
+            routeParameter = arguments
+        )
+    }
+
+    fun <P : Parameter, T : RouteWithParams<P>> pushReplacement(
+        route: T,
+        arguments: P,
+        intentConfig: IntentConfig? = null
+    ): Boolean {
+        return this.startInternal(
+            route = route,
+            resultCode = null,
+            intentConfig = intentConfig,
+            routeParameter = arguments,
+            finishActivity = true
+        )
+    }
+
+    fun <T : Route> pushForResult(
         route: T,
         resultCode: Int,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(route = route, resultCode = resultCode, intentConfig = intentConfig)
+        return this.startInternal(
+            route = route,
+            resultCode = resultCode,
+            intentConfig = intentConfig
+        )
     }
 
-    fun <P: RouteParameter, T : RouteWithParams<P>> startForResult(
+    fun <P : Parameter, T : RouteWithParams<P>> pushForResult(
         route: T,
         resultCode: Int,
-        intentConfig: IntentConfig? = null,
-        arguments: P
+        arguments: P,
+        intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(route = route, resultCode = resultCode, intentConfig = intentConfig, routeParameter = arguments)
+        return this.startInternal(
+            route = route,
+            resultCode = resultCode,
+            intentConfig = intentConfig,
+            routeParameter = arguments
+        )
     }
 
+    /**
+     * For route
+     * if route has arguments => routeArguments != null
+     */
     private fun <T : AbstractRoute> startInternal(
         route: T,
         resultCode: Int? = null,
         intentConfig: IntentConfig? = null,
-        routeParameter: RouteParameter? = null
+        routeParameter: Parameter? = null,
+        finishActivity : Boolean = false
     ): Boolean {
         val containRoute = routing.containsKey(route)
         val context = starterHandler.context ?: return false
@@ -98,7 +97,7 @@ class NavigatorStarter(
             val intentCreator = routing[route]
             intentCreator?.let {
 
-                val intent: Intent = when(it) {
+                val intent: Intent = when (it) {
                     is Routing.IntentCreator -> it.creator(context)
                     is Routing.IntentCreatorWithParams -> it.creator(context, routeParameter!!)
                     is Routing.IntentFlavorCreatorWithRouteParams -> return false //not possible without a flavor
@@ -120,6 +119,10 @@ class NavigatorStarter(
                 } else {
                     starterHandler.startForResult(intent, resultCode)
                 }
+
+                if(finishActivity) {
+                    starterHandler.activity?.finish()
+                }
             } ?: run {
                 throw MissingIntentThrowable(routeName = route.name)
             }
@@ -129,7 +132,7 @@ class NavigatorStarter(
         return containRoute
     }
 
-    fun <T : AbstractRoute.Flavor<*>> start(
+    fun <T : Flavor<*>> push(
         routeConfiguration: T,
         intentConfig: IntentConfig? = null
     ): Boolean {
@@ -140,7 +143,7 @@ class NavigatorStarter(
         )
     }
 
-    fun <FR: RouteParameter, ROUTE : Route, F : AbstractRoute.FlavorWithParams<ROUTE, FR>> start(
+    fun <FR : Parameter, ROUTE : Route, F : FlavorWithParams<ROUTE, FR>> push(
         routeConfiguration: F,
         arguments: FR,
         intentConfig: IntentConfig? = null
@@ -149,11 +152,11 @@ class NavigatorStarter(
             routeConfiguration = routeConfiguration,
             resultCode = null,
             intentConfig = intentConfig,
-            arguments = arguments
+            flavorParameters = arguments
         )
     }
 
-    fun <FR: RouteParameter, RP: RouteParameter, ROUTE : RouteWithParams<RP>, F : AbstractRoute.FlavorWithParams<ROUTE, FR>> start(
+    fun <FR : Parameter, RP : Parameter, ROUTE : RouteWithParams<RP>, F : FlavorWithParams<ROUTE, FR>> start(
         routeConfiguration: F,
         routeArguments: RP,
         arguments: FR,
@@ -163,12 +166,12 @@ class NavigatorStarter(
             routeConfiguration = routeConfiguration,
             resultCode = null,
             intentConfig = intentConfig,
-            routeArguments = routeArguments,
-            arguments = arguments
+            routeParameters = routeArguments,
+            flavorParameters = arguments
         )
     }
 
-    fun <T : AbstractRoute.Flavor<*>> startForResult(
+    fun <T : Flavor<*>> pushForResult(
         route: T,
         resultCode: Int,
         intentConfig: IntentConfig? = null
@@ -180,26 +183,31 @@ class NavigatorStarter(
         )
     }
 
-    fun <R: RouteParameter, T : AbstractRoute.FlavorWithParams<*, R>> startForResult(
+    fun <R : Parameter, T : FlavorWithParams<*, R>> pushForResult(
         route: T,
         resultCode: Int,
-        intentConfig: IntentConfig? = null,
-        arguments: R
+        arguments: R,
+        intentConfig: IntentConfig? = null
     ): Boolean {
         return this.startInternal(
             routeConfiguration = route,
             resultCode = resultCode,
             intentConfig = intentConfig,
-            arguments = arguments
+            flavorParameters = arguments
         )
     }
 
-    private fun <T : AbstractRoute.AbstractFlavor<*>> startInternal(
+    /**
+     * For flavors
+     * if flavor has params => flavorParameters != null
+     * if route has params => routeParameters != null
+     */
+    private fun <T : AbstractFlavor<*>> startInternal(
         routeConfiguration: T,
         resultCode: Int? = null,
         intentConfig: IntentConfig? = null,
-        routeArguments: RouteParameter? = null,
-        arguments: RouteParameter? = null
+        routeParameters: Parameter? = null,
+        flavorParameters: Parameter? = null
     ): Boolean {
 
         val route = routeConfiguration.route
@@ -215,17 +223,21 @@ class NavigatorStarter(
                 extras.putString(ROUTE_INTENT_KEY, route.name)
                 extras.putString(SUB_ROUTE_INTENT_KEY, routeConfiguration.name)
 
-                if(arguments != null) {
-                    extras.putSerializable(ROUTE_FLAVOR_ARGS_KEY, arguments)
+                if (flavorParameters != null) {
+                    extras.putSerializable(ROUTE_FLAVOR_ARGS_KEY, flavorParameters)
                 }
-                if(routeArguments != null) {
-                    extras.putSerializable(ROUTE_ARGS_KEY, routeArguments)
+                if (routeParameters != null) {
+                    extras.putSerializable(ROUTE_ARGS_KEY, routeParameters)
                 }
 
-                val intent: Intent = when(it){
+                val intent: Intent = when (it) {
                     is Routing.IntentCreator -> it.creator(context)
-                    is Routing.IntentCreatorWithParams -> it.creator(context, routeArguments!!)
-                    is Routing.IntentFlavorCreatorWithRouteParams -> it.creator(context, routeArguments!!, arguments!!)
+                    is Routing.IntentCreatorWithParams -> it.creator(context, routeParameters!!)
+                    is Routing.IntentFlavorCreatorWithRouteParams -> it.creator(
+                        context,
+                        routeParameters!!,
+                        flavorParameters!!
+                    )
                 }
 
                 intent.putExtras(extras)

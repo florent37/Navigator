@@ -3,7 +3,7 @@
 
     <application>
         <provider
-            android:authorities="${applicationId}.user.core.DependenciesProvider"
+            android:authorities="${applicationId}.post.core.DependenciesProvider"
             android:name=".DependenciesProvider"/>
     </application>
 

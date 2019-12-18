@@ -28,7 +28,7 @@ class UserActivity : AppCompatActivity() {
         })
 
         goToPosts.setOnClickListener {
-            Navigator.of(this).start(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId = args.userId))
+            Navigator.of(this).push(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId = args.userId))
         }
     }
 }
