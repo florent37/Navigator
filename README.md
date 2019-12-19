@@ -1,6 +1,6 @@
 # Navigator
 
-Multi-module navigator
+Android Multi-module navigator, trying to find a way to navigate into a modularized androud multi module project
 
 # Import
 
