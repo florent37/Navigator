@@ -3,7 +3,8 @@
     package="com.github.florent37.home">
 
     <application>
-        <activity android:name="com.github.florent37.home.HomeActivity"/>
+        <activity android:name=".HomeActivity"
+            android:launchMode="singleTop"/>
 
         <provider
             android:authorities="${applicationId}.home.RouteProvider"

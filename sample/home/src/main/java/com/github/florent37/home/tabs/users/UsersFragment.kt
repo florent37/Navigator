@@ -20,7 +20,9 @@ class UsersFragment : Fragment(R.layout.fragment_users) {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = UsersAdapter(listener = { user ->
-            Navigator.of(this).push(Routes.User, Routes.User.Params(userId = user.id))
+            Navigator.of(this).push(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId =  user.id))
+
+            //Navigator.of(this).push(Routes.User, Routes.User.Params(userId = user.id))
         })
 
         usersRecycler.adapter = adapter
