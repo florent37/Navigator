@@ -13,9 +13,11 @@ import com.github.florent37.application.provider.ActivityState
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.stream.Stream
 
 typealias INTENT_CREATOR = (Context) -> Intent
 typealias INTENT_CREATOR_WITH_PARAM = (Context, Parameter) -> Intent
@@ -31,9 +33,8 @@ sealed class Routing {
 
 class RouteListener {
     private val route = Stack<Destination>()
-
-    private val _currentRoute = MutableLiveData<Destination?>()
-    val currentRoute: LiveData<Destination?> = _currentRoute
+    private val _currentRoute = ConflatedBroadcastChannel<Destination?>()
+    val currentRoute = _currentRoute.asFlow()
 
     fun last(): Destination? = try {
         route.peek()
@@ -42,7 +43,7 @@ class RouteListener {
     }
 
     fun update() {
-        _currentRoute.postValue(last())
+        _currentRoute.offer(last())
         Log.d("RouteListener", route.toString())
     }
 
@@ -51,6 +52,7 @@ class RouteListener {
             route.pop()
         } catch (t: Throwable) {
         }
+        update()
     }
 
     fun pushReplacement(destination: Destination) {
@@ -63,6 +65,10 @@ class RouteListener {
 
     fun push(destination: Destination) {
         route.push(destination)
+    }
+
+    fun navigationStack(): List<Destination> {
+        return route
     }
 }
 
@@ -134,7 +140,10 @@ object Navigator {
             Routing.IntentFlavorCreatorWithRouteParams(creator as INTENT_CREATOR_WITH_TWO_PARAM)
     }
 
-    val navigation: LiveData<Destination?>
+    val navigationStack : List<Destination>
+            get() = routeListener.navigationStack()
+
+    val navigation: Flow<Destination?>
         get() = routeListener.currentRoute
 
     fun of(application: Application) =
