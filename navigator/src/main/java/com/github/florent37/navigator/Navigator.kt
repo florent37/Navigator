@@ -13,7 +13,7 @@ import com.github.florent37.application.provider.ActivityState
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -41,7 +41,7 @@ class RouteListener {
         null
     }
 
-    private fun update() {
+    fun update() {
         _currentRoute.postValue(last())
         Log.d("RouteListener", route.toString())
     }
@@ -51,7 +51,6 @@ class RouteListener {
             route.pop()
         } catch (t: Throwable) {
         }
-        update()
     }
 
     fun pushReplacement(destination: Destination) {
@@ -60,12 +59,10 @@ class RouteListener {
         } catch (t: Throwable) {
         }
         route.push(destination)
-        update()
     }
 
     fun push(destination: Destination) {
         route.push(destination)
-        update()
     }
 }
 
@@ -76,6 +73,7 @@ object Navigator {
 
     init {
         listenToBackpressed()
+        listenActivityChanged()
     }
 
     private val TAG = "Navigator_TAG"
@@ -89,6 +87,20 @@ object Navigator {
             ActivityProvider.listenToOnBackPress.collect {
                 routeListener.pop()
             }
+        }
+    }
+
+
+    /**
+     * A backpressed => OnPause => OnStop => OnDestroy (without any other state)
+     */
+    private fun listenActivityChanged() {
+        GlobalScope.launch {
+            ActivityProvider.listenActivityChanged()
+                .collect {
+                    Log.d("activity_changed", it.name)
+                    routeListener.update()
+                }
         }
     }
 

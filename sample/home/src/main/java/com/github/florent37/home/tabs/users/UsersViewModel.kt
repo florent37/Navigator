@@ -27,6 +27,7 @@ class UsersViewModel(private val userRepository : UserRepository) : ViewModel() 
     }
 
     fun onUserClicked(user: User) {
-        Navigator.current()?.push(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId =  user.id))
+        //Navigator.current()?.push(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId =  user.id))
+        Navigator.current()?.push(Routes.User, Routes.User.Params(userId =  user.id))
     }
 }
