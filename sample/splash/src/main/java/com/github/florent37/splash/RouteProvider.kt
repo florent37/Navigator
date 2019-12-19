@@ -7,7 +7,7 @@ import com.github.florent37.routing.Routes
 /* Called at startup */
 class RouteProvider : Provider() {
     override fun provide() {
-        Routes.Splash.register {
+        Routes.Splash.register { context ->
             Intent(context, SplashActivity::class.java)
         }
     }
