@@ -3,7 +3,7 @@
 # Import
 
 ```groovy
-implementation "com.github.florent37:navigator:(last-version)"
+implementation "com.github.florent37:navigator:0.0.3"
 ```
 
 # Define routes 
@@ -11,7 +11,7 @@ implementation "com.github.florent37:navigator:(last-version)"
 In a dedicated module, created shared routes into a `Route` object
 
 in module `routing` :
-```
+```kotlin
 object Routes {
 
     object Splash : Route("/")
@@ -78,7 +78,9 @@ Navigator.of(this).push(Routes.User, UserParams(userId= "3"))
 
 # Pop
 
+```kotlin
 Navigator.of(this).pop()
+```
 
 # PushReplacement
 
