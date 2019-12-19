@@ -24,6 +24,11 @@ project
   \--user
 ```
 
+And we want the next screen flow
+```
+app --[directly starts]--> Splash --> Home --[clicks on an user]--> User(id) 
+```
+
 - `splash` should only know `routing`
 - `home` should only know `routing`
 - `user` should only know `routing`
