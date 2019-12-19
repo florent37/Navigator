@@ -41,6 +41,7 @@ If you want an android module to register automatically its route,
 you can bind using applicationprovider's auto providers :
 
 ```kotlin
+//automatically launched after application's onCreate()
 class RouteProvider : Provider() {
     override fun provide() {
         Routes.Splash.register { context ->
