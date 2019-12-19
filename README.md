@@ -16,9 +16,9 @@ object Routes {
 
     object Splash : Route("/")
     
-    object Home : Route("/")
+    object Home : Route("/home")
     
-    object User : RouteWithParams<UserParams>("/") {
+    object User : RouteWithParams<UserParams>("/user") {
         class UserParams(val userId: String) : Params
     }
 }
