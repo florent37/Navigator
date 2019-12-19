@@ -24,10 +24,10 @@ project
   \--user
 ```
 
-- `splash` should know only `routing`
-- `home` should know only `routing`
-- `user` should know only `routing`
-- `app` should not know only `routing` to start a splash
+- `splash` should only know `routing`
+- `home` should only know `routing`
+- `user` should only know `routing`
+- `app` should only know `routing` to present the splash
 - `routing` should not know others modules
 
 # Define routes 
