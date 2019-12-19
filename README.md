@@ -1,5 +1,7 @@
 # Navigator
 
+Multi-module navigator
+
 # Import
 
 ```groovy
