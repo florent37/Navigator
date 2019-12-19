@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.github.florent37.home.R
 import com.github.florent37.navigator.Navigator
+import com.github.florent37.navigator.onNavigationChange
 import com.github.florent37.routing.Routes
 import kotlinx.android.synthetic.main.fragment_users.*
 import org.koin.android.viewmodel.ext.android.viewModel

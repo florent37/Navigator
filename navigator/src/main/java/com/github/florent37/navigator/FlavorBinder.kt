@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -55,9 +56,11 @@ fun Activity.updateIntent(newIntent: Intent?){
     this.intent = this.intent?.updateWith(newIntent)
 }
 
-fun LifecycleOwner.onNavigationChange(block: (Destination?) -> Unit) {
+fun LifecycleOwner.onNavigationChange(block: (Destination?) -> Unit) = lifecycleScope.onNavigationChange(block)
+
+fun CoroutineScope.onNavigationChange(block: (Destination?) -> Unit) {
     Navigator.navigation.onEach {
         //reload when the navigation changes
         block(it)
-    }.launchIn(lifecycleScope)
+    }.launchIn(this)
 }
