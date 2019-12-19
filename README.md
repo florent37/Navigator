@@ -8,6 +8,28 @@ Android Multi-module navigator, trying to find a way to navigate into a modulari
 implementation "com.github.florent37:navigator:0.0.3"
 ```
 
+# Multi module sample
+
+```
+project
+  |
+  \--app
+  |
+  \--routing
+  |
+  \--splash
+  |
+  \--home
+  |
+  \--user
+```
+
+- `splash` should know only `routing`
+- `home` should know only `routing`
+- `user` should know only `routing`
+- `app` should not know only `routing` to start a splash
+- `routing` should not know others modules
+
 # Define routes 
 
 In a dedicated module, created shared routes into a `Route` object
@@ -90,5 +112,5 @@ Navigator.of(this).pop()
 If you want to replace the current screen
 
 ```kotlin
-Navigator.current()?.pushReplacement(Routes.Home)
+Navigator.current()?.pushReplacement(Routes.Splash)
 ```
