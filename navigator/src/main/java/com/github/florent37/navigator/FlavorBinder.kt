@@ -3,7 +3,11 @@ package com.github.florent37.navigator
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 fun <C : AbstractFlavor<*>> Activity.invokeOnRouteFlavor(
     intent: Intent? = null,
@@ -49,4 +53,11 @@ fun Intent?.updateWith(newIntent: Intent?) : Intent? {
 
 fun Activity.updateIntent(newIntent: Intent?){
     this.intent = this.intent?.updateWith(newIntent)
+}
+
+fun LifecycleOwner.onNavigationChange(block: (Destination?) -> Unit) {
+    Navigator.navigation.onEach {
+        //reload when the navigation changes
+        block(it)
+    }.launchIn(lifecycleScope)
 }

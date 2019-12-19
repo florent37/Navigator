@@ -22,6 +22,7 @@ dependencies {
     api "androidx.fragment:fragment:1.1.0"
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    api "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
     api 'com.google.android.material:material:1.0.0'
 }
