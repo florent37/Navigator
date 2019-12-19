@@ -20,8 +20,12 @@ class PostsUseCase(val postRepository: PostRepository, val userRepository: UserR
                     )
                 }
         } else {
+            val users = userRepository.getUsers()
             postRepository.getPosts().map {
-                PostWithUser(post = it)
+                PostWithUser(
+                    post = it,
+                    author = users[it.authorId]
+                )
             }
         }
     }

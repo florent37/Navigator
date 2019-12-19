@@ -9,14 +9,30 @@ typealias IntentConfig = (Intent) -> Unit
 
 class NavigatorStarter(
     private val starterHandler: StarterHandler,
+    private val routeListener: RouteListener,
     private val routing: Map<Destination, Routing>
 ) {
     fun <T : Route> push(route: T, intentConfig: IntentConfig? = null): Boolean {
-        return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig)
+        val success =
+            this.startInternal(route = route, resultCode = null, intentConfig = intentConfig)
+        if (success) {
+            routeListener.push(route)
+        }
+        return success
     }
 
     fun <T : Route> pushReplacement(route: T, intentConfig: IntentConfig? = null): Boolean {
-        return this.startInternal(route = route, resultCode = null, intentConfig = intentConfig, finishActivity= true)
+        val success = this.startInternal(
+            route = route,
+            resultCode = null,
+            intentConfig = intentConfig,
+            finishActivity = true
+        )
+
+        if (success) {
+            routeListener.pushReplacement(route)
+        }
+        return success
     }
 
     fun pop(resultCode: Int, data: Intent?) {
@@ -31,12 +47,16 @@ class NavigatorStarter(
         arguments: P,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             route = route,
             resultCode = null,
             intentConfig = intentConfig,
             routeParameter = arguments
         )
+        if (success) {
+            routeListener.push(route)
+        }
+        return success
     }
 
     fun <P : Parameter, T : RouteWithParams<P>> pushReplacement(
@@ -44,13 +64,17 @@ class NavigatorStarter(
         arguments: P,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             route = route,
             resultCode = null,
             intentConfig = intentConfig,
             routeParameter = arguments,
             finishActivity = true
         )
+        if (success) {
+            routeListener.pushReplacement(route)
+        }
+        return success
     }
 
     fun <T : Route> pushForResult(
@@ -58,11 +82,15 @@ class NavigatorStarter(
         resultCode: Int,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             route = route,
             resultCode = resultCode,
             intentConfig = intentConfig
         )
+        if (success) {
+            routeListener.push(route)
+        }
+        return success
     }
 
     fun <P : Parameter, T : RouteWithParams<P>> pushForResult(
@@ -71,12 +99,16 @@ class NavigatorStarter(
         arguments: P,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             route = route,
             resultCode = resultCode,
             intentConfig = intentConfig,
             routeParameter = arguments
         )
+        if (success) {
+            routeListener.push(route)
+        }
+        return success
     }
 
     /**
@@ -88,7 +120,7 @@ class NavigatorStarter(
         resultCode: Int? = null,
         intentConfig: IntentConfig? = null,
         routeParameter: Parameter? = null,
-        finishActivity : Boolean = false
+        finishActivity: Boolean = false
     ): Boolean {
         val containRoute = routing.containsKey(route)
         val context = starterHandler.context ?: return false
@@ -119,7 +151,7 @@ class NavigatorStarter(
                     starterHandler.startForResult(intent, resultCode)
                 }
 
-                if(finishActivity) {
+                if (finishActivity) {
                     starterHandler.activity?.finish()
                 }
             } ?: run {
@@ -135,11 +167,15 @@ class NavigatorStarter(
         routeConfiguration: T,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             routeConfiguration = routeConfiguration,
             resultCode = null,
             intentConfig = intentConfig
         )
+        if (success) {
+            routeListener.push(routeConfiguration)
+        }
+        return success
     }
 
     fun <FR : Parameter, ROUTE : Route, F : FlavorWithParams<ROUTE, FR>> push(
@@ -147,27 +183,35 @@ class NavigatorStarter(
         arguments: FR,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             routeConfiguration = routeConfiguration,
             resultCode = null,
             intentConfig = intentConfig,
             flavorParameters = arguments
         )
+        if (success) {
+            routeListener.push(routeConfiguration)
+        }
+        return success
     }
 
-    fun <FR : Parameter, RP : Parameter, ROUTE : RouteWithParams<RP>, F : FlavorWithParams<ROUTE, FR>> start(
+    fun <FR : Parameter, RP : Parameter, ROUTE : RouteWithParams<RP>, F : FlavorWithParams<ROUTE, FR>> push(
         routeConfiguration: F,
         routeArguments: RP,
         arguments: FR,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             routeConfiguration = routeConfiguration,
             resultCode = null,
             intentConfig = intentConfig,
             routeParameters = routeArguments,
             flavorParameters = arguments
         )
+        if (success) {
+            routeListener.push(routeConfiguration)
+        }
+        return success
     }
 
     fun <T : Flavor<*>> pushForResult(
@@ -175,11 +219,15 @@ class NavigatorStarter(
         resultCode: Int,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             routeConfiguration = route,
             resultCode = resultCode,
             intentConfig = intentConfig
         )
+        if (success) {
+            routeListener.push(route)
+        }
+        return success
     }
 
     fun <R : Parameter, T : FlavorWithParams<*, R>> pushForResult(
@@ -188,12 +236,16 @@ class NavigatorStarter(
         arguments: R,
         intentConfig: IntentConfig? = null
     ): Boolean {
-        return this.startInternal(
+        val success = this.startInternal(
             routeConfiguration = route,
             resultCode = resultCode,
             intentConfig = intentConfig,
             flavorParameters = arguments
         )
+        if (success) {
+            routeListener.push(route)
+        }
+        return success
     }
 
     /**

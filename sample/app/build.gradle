@@ -28,7 +28,7 @@ dependencies {
     implementation project(':sample:user')
     implementation project(':sample:home')
     implementation project(":navigator")
-    implementation 'com.github.florent37:applicationprovider:1.0.1'
+    implementation "com.github.florent37:applicationprovider:$applicationprovider_version"
 
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-viewmodel:$koin_version"

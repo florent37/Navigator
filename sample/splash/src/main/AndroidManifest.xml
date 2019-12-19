@@ -10,6 +10,10 @@
         <provider
             android:authorities="${applicationId}.splash.RouteProvider"
             android:name=".RouteProvider"/>
+
+        <provider
+            android:authorities="${applicationId}.splash.DependenciesProvider"
+            android:name=".DependenciesProvider"/>
     </application>
 
 </manifest>

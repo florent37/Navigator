@@ -30,7 +30,7 @@ class UsersAdapter(val listener: UserClickListener) : RecyclerView.Adapter<UserV
 
 class UserViewHolder(
     view: View,
-    val listener: UserClickListener
+    private val listener: UserClickListener
 ) : RecyclerView.ViewHolder(view) {
 
     companion object {
