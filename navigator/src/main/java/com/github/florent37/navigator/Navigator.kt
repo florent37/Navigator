@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.github.florent37.application.provider.ActivityProvider
 import com.github.florent37.application.provider.ActivityState
+import com.github.florent37.navigator.exceptions.AlreadyRegisteredException
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
 import kotlinx.coroutines.GlobalScope
@@ -124,7 +125,11 @@ object Navigator {
      * Used by routes, register a route to an intent creator
      */
     fun registerRoute(route: AbstractRoute, creator: INTENT_CREATOR) {
-        routing[route] = Routing.IntentCreator(creator)
+        if(routing.containsKey(route)){
+            throw AlreadyRegisteredException(route.name)
+        } else {
+            routing[route] = Routing.IntentCreator(creator)
+        }
     }
 
     /**
@@ -134,14 +139,22 @@ object Navigator {
         route: RouteWithParams<P>,
         creator: (Context, P) -> Intent
     ) {
-        routing[route] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
+        if(routing.containsKey(route)){
+            throw AlreadyRegisteredException(route.name)
+        } else {
+            routing[route] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
+        }
     }
 
     /**
      * Used by flavors, register a flavor to an intent creator
      */
     fun registerRoute(flavor: AbstractFlavor<*>, creator: INTENT_CREATOR) {
-        routing[flavor] = Routing.IntentCreator(creator)
+        if(routing.containsKey(flavor)){
+            throw AlreadyRegisteredException(flavor.name)
+        } else {
+            routing[flavor] = Routing.IntentCreator(creator)
+        }
     }
 
     /**
@@ -151,18 +164,27 @@ object Navigator {
         flavor: FlavorWithParams<R, P>,
         creator: (Context, P) -> Intent
     ) {
-        routing[flavor] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
+        if(routing.containsKey(flavor)){
+            throw AlreadyRegisteredException(flavor.name)
+        } else {
+            routing[flavor] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
+        }
     }
 
     /**
      * Used by flavors, register a flavor (of a parameterized route) to an intent creator (with params)
      */
+    @Throws(AlreadyRegisteredException::class)
     fun <RP : Parameter, R : RouteWithParams<RP>, P : Parameter> registerRoute(
         flavor: FlavorWithParams<R, P>,
         creator: (Context, RP, P) -> Intent
     ) {
-        routing[flavor] =
-            Routing.IntentFlavorCreatorWithRouteParams(creator as INTENT_CREATOR_WITH_TWO_PARAM)
+        if(routing.containsKey(flavor)){
+            throw AlreadyRegisteredException(flavor.name)
+        } else {
+            routing[flavor] =
+                Routing.IntentFlavorCreatorWithRouteParams(creator as INTENT_CREATOR_WITH_TWO_PARAM)
+        }
     }
 
     /**
