@@ -82,8 +82,8 @@ then declare it in your module's AndroidManifest.xml
 
 ```xml
 <provider
-      android:authorities="${applicationId}.splash.DependenciesProvider"
-      android:name=".DependenciesProvider"/>
+      android:authorities="${applicationId}.splash.RouteProvider"
+      android:name=".RouteProvider"/>
 ```
 
 # Navigation
