@@ -137,8 +137,49 @@ Navigator.current()?.pushReplacement(Routes.Splash)
 
 # Route Flavors
 
-//TODO
+A flavor is an endpoint of a route, you can use them to navigate to an Activity's BottomNavigation item
 
+//explain this
+
+```kotlin
+object Home : Route("/home/") {
+     object UserTabs : Flavor<Home>(this,"home/tabUsers")
+
+     object PostsTabs : FlavorWithParams<Home, PostsTabs.Params>(this,"home/tabPosts") {
+         class Params(val userId: Int?) : Parameter()
+     }
+}
+```
+
+You can push this like a route
+
+```kotlin
+Navigator.current()?.push(Routes.Home.UserTabs)
+```
+
+And bind this into your Activity
+
+```kotlin
+class HomeActivity : AppCompatActivity(R.layout.activity_home) {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewPager.adapter = ViewPagerAdapter(
+            supportFragmentManager
+        )
+
+        bottomNav.setupWithViewPager(viewPager)
+
+        bindFlavor(Routes.Home.UserTabs, intent)
+            .withBottomNav(bottomNav, R.id.tabUsers)
+
+        bindFlavor(Routes.Home.PostsTabs, intent)
+            .withBottomNav(bottomNav, R.id.tabPosts)
+
+    }
+}
+```
 
 # Credits
 

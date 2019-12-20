@@ -1,6 +1,5 @@
 package com.github.florent37.home
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -14,15 +13,12 @@ import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
-    lateinit var adapter: ViewPagerAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        adapter = ViewPagerAdapter(
+        viewPager.adapter = ViewPagerAdapter(
             supportFragmentManager
         )
-        viewPager.adapter = adapter
 
         bottomNav.setupWithViewPager(viewPager)
 
@@ -37,7 +33,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
         setupFlavor()
     }
 
-    private fun setupFlavor(){
+    private fun setupFlavor() {
         bindFlavor(Routes.Home.UserTabs, intent)
             .withBottomNav(bottomNav, R.id.tabUsers)
 
