@@ -11,6 +11,12 @@ internal const val SUB_ROUTE_INTENT_KEY = "__\$__NAVIGAROR_SUB_ROUTE_KEY__\$__"
 
 typealias INTENT_PARAMETER = (Intent) -> Unit
 
+/**
+ * Base class of routes & routes with parameters
+ * can associate a route with an activity
+ *
+ * `TheRoute.registerActivity<MyActivity>()`
+ */
 abstract class AbstractRoute(
     override val name: String
 ) : Destination {
@@ -21,12 +27,24 @@ abstract class AbstractRoute(
     }
 }
 
+/**
+ * A Route without parameter
+ *
+ * object MyRoute : Route("theAdress")
+ */
 open class Route(name: String) : AbstractRoute(name) {
     fun register(creator: INTENT_CREATOR) {
         Navigator.registerRoute(this, creator)
     }
 }
 
+/**
+ * A Route without parameter
+ *
+ * object MyRoute : RouteWithParams<ParameterClass>("theAdress") {
+ *  class ParameterClass(val param1: Int, val param2: String)
+ * }
+ */
 open class RouteWithParams<P : Parameter>(name: String) : AbstractRoute(name) {
 
     fun register(creator: (Context, P) -> Intent) {
