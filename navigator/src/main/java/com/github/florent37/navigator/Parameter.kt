@@ -8,18 +8,38 @@ import kotlin.reflect.KProperty
 
 open class Parameter : Serializable
 
+/**
+ * Retrieve a non nullable route Parameter
+ *
+ * val args = routeParamValue<MyRoute.MyParam>
+ */
 fun <T> Activity.routeParamValue(): T {
     return this.intent.getSerializableExtra(ROUTE_ARGS_KEY) as T
 }
 
+/**
+ * Retrieve a non nullable flavor Parameter
+ *
+ * val args = flavorParamValue<MyRoute.MyParam>
+ */
 fun <T> Activity.flavorParamValue(): T {
     return this.intent.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as T
 }
 
+/**
+ * Retrieve a nullable route Parameter
+ *
+ * val args  : MyRoute.MyParam? = optionalRouteParamValue<MyRoute.MyParam>
+ */
 fun <T> Activity.optionalRouteParamValue(): T? {
     return this.intent?.getSerializableExtra(ROUTE_ARGS_KEY) as? T
 }
 
+/**
+ * Retrieve a nullable flavor Parameter
+ *
+ * val args : MyRoute.MyParam? = optionalFlavorParamValue<MyRoute.MyParam>
+ */
 fun <T> Activity.optionalFlavorParamValue(): T? {
     return this.intent?.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as? T
 }
