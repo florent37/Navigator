@@ -104,9 +104,23 @@ Navigator.current()?.push(Routes.Home)
 
 ## A route with parameters
 
+Navigating to a route with parameters forces to specify values
 ```kotlin
 Navigator.of(this).push(Routes.User, UserParams(userId= "3"))
 ```
+
+You can retrieve them using kotlin's delegated properties
+
+```kotlin
+class UserActivity : Activity {
+    private val args by parameter<Routes.User.Params>()
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+    
+            val userId = args.userId
+```
+
 
 ## Pop
 
