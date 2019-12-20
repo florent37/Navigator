@@ -52,10 +52,6 @@ fun Intent?.updateWith(newIntent: Intent?) : Intent? {
     } ?: newIntent
 }
 
-fun Activity.updateIntent(newIntent: Intent?){
-    this.intent = this.intent?.updateWith(newIntent)
-}
-
 fun LifecycleOwner.onNavigationChange(block: (Destination?) -> Unit) = lifecycleScope.onNavigationChange(block)
 
 fun CoroutineScope.onNavigationChange(block: (Destination?) -> Unit) {
