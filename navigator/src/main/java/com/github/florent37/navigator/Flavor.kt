@@ -2,6 +2,23 @@ package com.github.florent37.navigator
 
 import android.app.Activity
 import android.content.Intent
+import com.github.florent37.navigator.AllFlavors._allFlavors
+import com.github.florent37.navigator.exceptions.MissingFlavorImplementation
+
+object AllFlavors {
+    internal val _allFlavors = mutableListOf<AbstractFlavor<*>>()
+    val allFlavors: List<AbstractFlavor<*>>
+        get() = _allFlavors
+
+    @Throws(MissingFlavorImplementation::class)
+    fun assertAllFlavorsImplemented(){
+        allFlavors.forEach {
+            if(!Navigator.hasImplementation(it)){
+                throw MissingFlavorImplementation(it.name)
+            }
+        }
+    }
+}
 
 /**
  * Base class of flavors
@@ -9,6 +26,7 @@ import android.content.Intent
  * yoy can associate a flavor with an activity
  * `TheFlavor.registerActivity<MyActivity>()`
  */
+@Suppress("LeakingThis")
 abstract class AbstractFlavor<R : AbstractRoute>(
     val route: R,
     override val name: String
@@ -17,6 +35,10 @@ abstract class AbstractFlavor<R : AbstractRoute>(
         Navigator.registerRoute(this) { context ->
             Intent(context, T::class.java).also { intentParameter?.invoke(it) }
         }
+    }
+
+    init {
+        _allFlavors.add(this)
     }
 }
 
@@ -45,7 +67,7 @@ abstract class Flavor<R : AbstractRoute>(
  *      }
  * }
  */
-abstract class FlavorWithParams<R : AbstractRoute, P: Parameter>(
+abstract class FlavorWithParams<R : AbstractRoute, P : Parameter>(
     route: R,
     name: String
 ) : AbstractFlavor<R>(route, name)

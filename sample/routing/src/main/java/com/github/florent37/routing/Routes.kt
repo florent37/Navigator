@@ -12,6 +12,7 @@ object Routes {
         object PostsTabs : FlavorWithParams<Home, PostsTabs.Params>(this,"$name/tabPosts") {
             class Params(val userId: Int?) : Parameter()
         }
+
     }
 
     object User : RouteWithParams<User.Params>("${Home.name}/user") {

@@ -271,9 +271,13 @@ object Navigator {
 
     /**
      * Search a flavor by name
-     */
+    */
     fun findFlavor(name: String): AbstractFlavor<*>? {
         return findDestination(name) as? AbstractFlavor<*>
+    }
+
+    fun hasImplementation(destination: Destination) : Boolean {
+        return routing.containsKey(destination)
     }
 
 }
