@@ -96,6 +96,8 @@ You can push a route from an activity (or fragment) using
 Navigator.of(this).push(Routes.Home)
 ```
 
+![Push](./medias/splash_push.png)
+
 You can also change the route from anywhere (eg: an android ViewModel) using `Navigator.current()`
 
 ```kotlin
@@ -156,6 +158,8 @@ You can push this like a route
 ```kotlin
 Navigator.current()?.push(Routes.Home.UserTabs)
 ```
+
+![Push](./medias/flavor.png)
 
 And bind this into your Activity
 
