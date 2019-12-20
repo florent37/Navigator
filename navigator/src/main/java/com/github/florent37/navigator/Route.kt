@@ -42,7 +42,7 @@ open class Route(name: String) : AbstractRoute(name) {
  * A Route without parameter
  *
  * object MyRoute : RouteWithParams<ParameterClass>("theAdress") {
- *  class ParameterClass(val param1: Int, val param2: String)
+ *  class ParameterClass(val param1: Int, val param2: String) : Param
  * }
  */
 open class RouteWithParams<P : Parameter>(name: String) : AbstractRoute(name) {

@@ -92,22 +92,69 @@ class OptionalParameterDelegate<T : Parameter>(
     }
 }
 
+/**
+ * Retrieve a non nullable route Parameter
+ *
+ * val args : MyRoute.MyParam by parameter<MyRoute.MyParam>()
+ */
 inline fun <reified T : Parameter> Activity.parameter() =
     ParameterDelegate(parameterClazz = T::class.java)
 
+/**
+ * Retrieve a nullable route Parameter
+ *
+ * val args : MyRoute.MyParam? by parameter<MyRoute.MyParam>()
+ */
 inline fun <reified T : Parameter> Activity.optionalParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java)
 
+/**
+ * Retrieve a non nullable route Parameter
+ *
+ * val args : MyRoute.MyParam by parameter<MyRoute.MyParam>()
+ */
 inline fun <reified T : Parameter> Fragment.routeParameter() =
     ParameterDelegate(parameterClazz = T::class.java, flavor = false)
 
-inline fun <reified T : Parameter> Fragment.flavorParameter() =
-    ParameterDelegate(parameterClazz = T::class.java, flavor = true)
-
+/**
+ * Retrieve a nullable route Parameter
+ *
+ * val args : MyRoute.MyParam? by parameter<MyRoute.MyParam>()
+ */
 inline fun <reified T : Parameter> Fragment.optionalRouteParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java, flavor = false)
 
+
+/**
+ * Retrieve a non nullable flavor Parameter
+ *
+ * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
+ */
+inline fun <reified T : Parameter> Fragment.flavorParameter() =
+    ParameterDelegate(parameterClazz = T::class.java, flavor = true)
+
+/**
+ * Retrieve a nullable flavor Parameter
+ *
+ * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
+ */
 inline fun <reified T : Parameter> Fragment.optionalFlavorParameter() =
+    OptionalParameterDelegate(parameterClazz = T::class.java, flavor = true)
+
+/**
+ * Retrieve a non nullable flavor Parameter
+ *
+ * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
+ */
+inline fun <reified T : Parameter> Activity.flavorParameter() =
+    ParameterDelegate(parameterClazz = T::class.java, flavor = true)
+
+/**
+ * Retrieve a nullable flavor Parameter
+ *
+ * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
+ */
+inline fun <reified T : Parameter> Activity.optionalFlavorParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java, flavor = true)
 
 
