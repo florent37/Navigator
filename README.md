@@ -185,6 +185,18 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 }
 ```
 
+And to retrieve a flavor parameter
+
+```kotlin
+class PostsFragment : Fragment {
+    private var args by optionalFlavorParameter<Routes.Home.PostsTabs.Params>()
+    
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val userId = args.userId
+```
+
 # Credits
 
 Author: Florent Champigny [http://www.florentchampigny.com/](http://www.florentchampigny.com/)
