@@ -132,6 +132,10 @@ object Navigator {
         }
     }
 
+    fun clearRoute(destination: Destination) {
+        routing.remove(destination)
+    }
+
     /**
      * Used by routes, register a route to an intent creator (with params)
      */

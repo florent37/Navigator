@@ -40,6 +40,10 @@ abstract class AbstractFlavor<R : AbstractRoute>(
     init {
         _allFlavors.add(this)
     }
+
+    fun clear() {
+        Navigator.clearRoute(this)
+    }
 }
 
 /**

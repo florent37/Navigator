@@ -50,6 +50,10 @@ abstract class AbstractRoute(
         _allRoutes.add(this)
     }
 
+    fun clear() {
+        Navigator.clearRoute(this)
+    }
+
     inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
         Navigator.registerRoute(this) { context ->
             Intent(context, T::class.java).also { intentParameter?.invoke(it) }
