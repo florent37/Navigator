@@ -65,7 +65,7 @@ Routes.Splash.register { context ->
 ```
 
 If you want an android module to register automatically its route, 
-you can bind using applicationprovider's auto providers :
+you can bind using [applicationprovider's auto providers](https://github.com/florent37/ApplicationProvider) :
 
 ```kotlin
 //automatically launched after application's onCreate()
@@ -120,7 +120,6 @@ class UserActivity : Activity {
     
         val userId = args.userId
 ```
-
 
 ## Pop
 
