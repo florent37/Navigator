@@ -116,9 +116,9 @@ class UserActivity : Activity {
     private val args by parameter<Routes.User.Params>()
     
     override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)
     
-            val userId = args.userId
+        val userId = args.userId
 ```
 
 
