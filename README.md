@@ -86,7 +86,9 @@ then declare it in your module's AndroidManifest.xml
       android:name=".DependenciesProvider"/>
 ```
 
-# Push
+# Navigation
+
+## Push
 
 You can push a route from an activity (or fragment) using 
 
@@ -106,16 +108,20 @@ Navigator.current()?.push(Routes.Home)
 Navigator.of(this).push(Routes.User, UserParams(userId= "3"))
 ```
 
-# Pop
+## Pop
 
 ```kotlin
 Navigator.of(this).pop()
 ```
 
-# PushReplacement
+## PushReplacement
 
 If you want to replace the current screen
 
 ```kotlin
 Navigator.current()?.pushReplacement(Routes.Splash)
 ```
+
+# Route Flavors
+
+//TODO
