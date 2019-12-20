@@ -72,6 +72,12 @@ class RouteListener {
     }
 }
 
+/**
+ * Singleton naviagor object, use this one to push or pop routes
+ * @see Navigator.push
+ * @see Navigator.pushForResult
+ * @see Navigator.pop
+ */
 object Navigator {
     private val routing = mutableMapOf<Destination, Routing>()
 
@@ -86,6 +92,8 @@ object Navigator {
 
 
     /**
+     * Try to listen to backpress, without implementing it into activity.onbackpress
+     * used to pop last route from RouteListener
      * A backpressed => OnPause => OnStop => OnDestroy (without any other state)
      */
     private fun listenToBackpressed() {
@@ -98,6 +106,8 @@ object Navigator {
 
 
     /**
+     * Try to listen to activities changes
+     * update listeners
      * A backpressed => OnPause => OnStop => OnDestroy (without any other state)
      */
     private fun listenActivityChanged() {
@@ -110,10 +120,16 @@ object Navigator {
         }
     }
 
+    /**
+     * Used by routes, register a route to an intent creator
+     */
     fun registerRoute(route: AbstractRoute, creator: INTENT_CREATOR) {
         routing[route] = Routing.IntentCreator(creator)
     }
 
+    /**
+     * Used by routes, register a route to an intent creator (with params)
+     */
     fun <P : Parameter> registerRoute(
         route: RouteWithParams<P>,
         creator: (Context, P) -> Intent
@@ -121,10 +137,16 @@ object Navigator {
         routing[route] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
     }
 
+    /**
+     * Used by flavors, register a flavor to an intent creator
+     */
     fun registerRoute(flavor: AbstractFlavor<*>, creator: INTENT_CREATOR) {
         routing[flavor] = Routing.IntentCreator(creator)
     }
 
+    /**
+     * Used by flavors, register a flavor (of a non parameterized route) to an intent creator (with params)
+     */
     fun <R : Route, P : Parameter> registerRoute(
         flavor: FlavorWithParams<R, P>,
         creator: (Context, P) -> Intent
@@ -132,6 +154,9 @@ object Navigator {
         routing[flavor] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
     }
 
+    /**
+     * Used by flavors, register a flavor (of a parameterized route) to an intent creator (with params)
+     */
     fun <RP : Parameter, R : RouteWithParams<RP>, P : Parameter> registerRoute(
         flavor: FlavorWithParams<R, P>,
         creator: (Context, RP, P) -> Intent
@@ -140,12 +165,21 @@ object Navigator {
             Routing.IntentFlavorCreatorWithRouteParams(creator as INTENT_CREATOR_WITH_TWO_PARAM)
     }
 
+    /**
+     * Access the current stack of routes & flavors
+     */
     val navigationStack : List<Destination>
             get() = routeListener.navigationStack()
 
+    /**
+     * Listen to the current stack of routes & flavors
+     */
     val navigation: Flow<Destination?>
         get() = routeListener.currentRoute
 
+    /**
+     * Retrieve the navigation starter from an application context
+     */
     fun of(application: Application) =
         NavigatorStarter(
             StarterHandler.ApplicationStarter(
@@ -155,6 +189,9 @@ object Navigator {
             routing.toMap()
         )
 
+    /**
+     * Retrieve the navigation starter from an activity
+     */
     fun of(activity: Activity) =
         NavigatorStarter(
             StarterHandler.ActivityStarter(
@@ -164,6 +201,9 @@ object Navigator {
             routing.toMap()
         )
 
+    /**
+     * Retrieve the navigation starter from a fragment
+     */
     fun of(fragment: Fragment) =
         NavigatorStarter(
             StarterHandler.FragmentStarter(
@@ -173,6 +213,10 @@ object Navigator {
             routing.toMap()
         )
 
+    /**
+     * Retrieve the navigation without any context
+     * It uses ActivityProvider from https://github.com/florent37/ApplicationProvider
+     */
     fun current(): NavigatorStarter? = ActivityProvider.currentActivity?.let { activity ->
         NavigatorStarter(
             StarterHandler.ActivityStarter(
@@ -183,7 +227,10 @@ object Navigator {
         )
     }
 
-    fun findRoute(name: String): Destination? {
+    /**
+     * Search a route or flavor by name
+     */
+    fun findDestination(name: String): Destination? {
         routing.forEach {
             val route = it.key
             if (it.key.name == name) {
@@ -191,6 +238,20 @@ object Navigator {
             }
         }
         return null
+    }
+
+    /**
+     * Search a route by name
+     */
+    fun findRoute(name: String): AbstractRoute? {
+        return findDestination(name) as? AbstractRoute
+    }
+
+    /**
+     * Search a flavor by name
+     */
+    fun findFlavor(name: String): AbstractFlavor<*>? {
+        return findDestination(name) as? AbstractFlavor<*>
     }
 
 }
