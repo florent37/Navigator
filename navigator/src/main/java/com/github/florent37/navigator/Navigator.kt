@@ -6,19 +6,18 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.github.florent37.application.provider.ActivityProvider
-import com.github.florent37.application.provider.ActivityState
 import com.github.florent37.navigator.exceptions.AlreadyRegisteredException
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
+import com.github.florent37.navigator.uri.PathMatcher
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.stream.Stream
 
 typealias INTENT_CREATOR = (Context) -> Intent
 typealias INTENT_CREATOR_WITH_PARAM = (Context, Parameter) -> Intent
@@ -52,6 +51,7 @@ class RouteListener {
         try {
             route.pop()
         } catch (t: Throwable) {
+        } catch (e: Exception) {
         }
         update()
     }
@@ -60,6 +60,7 @@ class RouteListener {
         try {
             route.pop()
         } catch (t: Throwable) {
+        } catch (e: Exception) {
         }
         route.push(destination)
     }
@@ -125,8 +126,8 @@ object Navigator {
      * Used by routes, register a route to an intent creator
      */
     fun registerRoute(route: AbstractRoute, creator: INTENT_CREATOR) {
-        if(routing.containsKey(route)){
-            throw AlreadyRegisteredException(route.name)
+        if (routing.containsKey(route)) {
+            throw AlreadyRegisteredException(route.path)
         } else {
             routing[route] = Routing.IntentCreator(creator)
         }
@@ -143,8 +144,8 @@ object Navigator {
         route: RouteWithParams<P>,
         creator: (Context, P) -> Intent
     ) {
-        if(routing.containsKey(route)){
-            throw AlreadyRegisteredException(route.name)
+        if (routing.containsKey(route)) {
+            throw AlreadyRegisteredException(route.path)
         } else {
             routing[route] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
         }
@@ -154,8 +155,8 @@ object Navigator {
      * Used by flavors, register a flavor to an intent creator
      */
     fun registerRoute(flavor: AbstractFlavor<*>, creator: INTENT_CREATOR) {
-        if(routing.containsKey(flavor)){
-            throw AlreadyRegisteredException(flavor.name)
+        if (routing.containsKey(flavor)) {
+            throw AlreadyRegisteredException(flavor.path)
         } else {
             routing[flavor] = Routing.IntentCreator(creator)
         }
@@ -168,8 +169,8 @@ object Navigator {
         flavor: FlavorWithParams<R, P>,
         creator: (Context, P) -> Intent
     ) {
-        if(routing.containsKey(flavor)){
-            throw AlreadyRegisteredException(flavor.name)
+        if (routing.containsKey(flavor)) {
+            throw AlreadyRegisteredException(flavor.path)
         } else {
             routing[flavor] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
         }
@@ -183,8 +184,8 @@ object Navigator {
         flavor: FlavorWithParams<R, P>,
         creator: (Context, RP, P) -> Intent
     ) {
-        if(routing.containsKey(flavor)){
-            throw AlreadyRegisteredException(flavor.name)
+        if (routing.containsKey(flavor)) {
+            throw AlreadyRegisteredException(flavor.path)
         } else {
             routing[flavor] =
                 Routing.IntentFlavorCreatorWithRouteParams(creator as INTENT_CREATOR_WITH_TWO_PARAM)
@@ -194,8 +195,8 @@ object Navigator {
     /**
      * Access the current stack of routes & flavors
      */
-    val navigationStack : List<Destination>
-            get() = routeListener.navigationStack()
+    val navigationStack: List<Destination>
+        get() = routeListener.navigationStack()
 
     /**
      * Listen to the current stack of routes & flavors
@@ -254,12 +255,14 @@ object Navigator {
     }
 
     /**
-     * Search a route or flavor by name
+     * Search a route or flavor by path
      */
-    fun findDestination(name: String): Destination? {
+    fun findDestination(path: String): Destination? {
         routing.forEach {
             val route = it.key
-            if (it.key.name == name) {
+            if (it.key.path == path) {
+                return route
+            } else if (PathMatcher(it.key.path).matches(path) == true) {
                 return route
             }
         }
@@ -267,20 +270,20 @@ object Navigator {
     }
 
     /**
-     * Search a route by name
+     * Search a route by path
      */
-    fun findRoute(name: String): AbstractRoute? {
-        return findDestination(name) as? AbstractRoute
+    fun findRoute(path: String): AbstractRoute? {
+        return findDestination(path) as? AbstractRoute
     }
 
     /**
-     * Search a flavor by name
-    */
-    fun findFlavor(name: String): AbstractFlavor<*>? {
-        return findDestination(name) as? AbstractFlavor<*>
+     * Search a flavor by path
+     */
+    fun findFlavor(path: String): AbstractFlavor<*>? {
+        return findDestination(path) as? AbstractFlavor<*>
     }
 
-    fun hasImplementation(destination: Destination) : Boolean {
+    fun hasImplementation(destination: Destination): Boolean {
         return routing.containsKey(destination)
     }
 

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.github.florent37.navigator.*
 import com.github.florent37.navigator.exceptions.MissingIntentThrowable
+import com.github.florent37.navigator.exceptions.PathNotFound
 
 typealias IntentConfig = (Intent) -> Unit
 
@@ -139,7 +140,7 @@ class NavigatorStarter(
                     extras.putSerializable(ROUTE_ARGS_KEY, routeParameter)
                 }
 
-                extras.putString(ROUTE_INTENT_KEY, route.name)
+                extras.putString(ROUTE_INTENT_KEY, route.path)
 
                 intent.putExtras(extras)
 
@@ -155,10 +156,10 @@ class NavigatorStarter(
                     starterHandler.activity?.finish()
                 }
             } ?: run {
-                throw MissingIntentThrowable(routeName = route.name)
+                throw MissingIntentThrowable(routeName = route.path)
             }
         } else {
-            throw MissingIntentThrowable(routeName = route.name)
+            throw MissingIntentThrowable(routeName = route.path)
         }
         return containRoute
     }
@@ -271,8 +272,8 @@ class NavigatorStarter(
 
                 val extras = Bundle()
 
-                extras.putString(ROUTE_INTENT_KEY, route.name)
-                extras.putString(SUB_ROUTE_INTENT_KEY, routeConfiguration.name)
+                extras.putString(ROUTE_INTENT_KEY, route.path)
+                extras.putString(SUB_ROUTE_INTENT_KEY, routeConfiguration.path)
 
                 if (flavorParameters != null) {
                     extras.putSerializable(ROUTE_FLAVOR_ARGS_KEY, flavorParameters)
@@ -301,11 +302,26 @@ class NavigatorStarter(
                     starterHandler.startForResult(intent, resultCode)
                 }
             } ?: run {
-                throw MissingIntentThrowable(routeName = route.name)
+                throw MissingIntentThrowable(routeName = route.path)
             }
         } else {
-            throw MissingIntentThrowable(routeName = route.name)
+            throw MissingIntentThrowable(routeName = route.path)
         }
         return containRoute
+    }
+
+    fun push(path: String) {
+        Navigator.findDestination(path = path).let { destination ->
+            when (destination) {
+                null -> throw PathNotFound(path)
+                is Route -> push(destination)
+                is RouteWithParams<*> -> {
+
+                }
+                is Flavor<*> -> push(destination)
+                is FlavorWithParams<*, *> -> TODO("how to handle params")
+                else -> { /* nothing to do */ }
+            }
+        }
     }
 }

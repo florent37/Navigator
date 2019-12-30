@@ -14,7 +14,7 @@ object AllFlavors {
     fun assertAllFlavorsImplemented(){
         allFlavors.forEach {
             if(!Navigator.hasImplementation(it)){
-                throw MissingFlavorImplementation(it.name)
+                throw MissingFlavorImplementation(it.path)
             }
         }
     }
@@ -29,7 +29,7 @@ object AllFlavors {
 @Suppress("LeakingThis")
 abstract class AbstractFlavor<R : AbstractRoute>(
     val route: R,
-    override val name: String
+    override val path: String
 ) : Destination {
     inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
         Navigator.registerRoute(this) { context ->

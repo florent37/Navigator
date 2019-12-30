@@ -14,7 +14,9 @@ class SplashViewModel : ViewModel() {
             delay(4 * 1000)
 
             Navigator.current()?.pushReplacement(Routes.Home)
+            //Navigator.current()?.push("/home/")
         }
     }
 
 }
+

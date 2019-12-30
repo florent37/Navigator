@@ -29,7 +29,7 @@ object AllRoutes {
     fun assertAllRoutesImplemented(){
         allRoutes.forEach {
             if(!Navigator.hasImplementation(it)){
-                throw MissingRouteImplementation(it.name)
+                throw MissingRouteImplementation(it.path)
             }
         }
     }
@@ -43,11 +43,14 @@ object AllRoutes {
  */
 @Suppress("LeakingThis")
 abstract class AbstractRoute(
-    override val name: String
+    override val path: String
 ) : Destination {
+
+    protected val paths = mutableListOf<String>()
 
     init {
         _allRoutes.add(this)
+        paths.add(path)
     }
 
     fun clear() {
@@ -59,6 +62,8 @@ abstract class AbstractRoute(
             Intent(context, T::class.java).also { intentParameter?.invoke(it) }
         }
     }
+
+    fun paths() = paths.toList()
 }
 
 /**
@@ -66,9 +71,13 @@ abstract class AbstractRoute(
  *
  * object MyRoute : Route("theAdress")
  */
-open class Route(name: String) : AbstractRoute(name) {
+open class Route(path: String) : AbstractRoute(path) {
     fun register(creator: INTENT_CREATOR) {
         Navigator.registerRoute(this, creator)
+    }
+
+    fun addPath(path: String){
+        super.paths.add(path)
     }
 }
 
@@ -79,9 +88,13 @@ open class Route(name: String) : AbstractRoute(name) {
  *  class ParameterClass(val param1: Int, val param2: String) : Param
  * }
  */
-open class RouteWithParams<P : Parameter>(name: String) : AbstractRoute(name) {
+open class RouteWithParams<P : Parameter>(path: String) : AbstractRoute(path) {
 
     fun register(creator: (Context, P) -> Intent) {
         Navigator.registerRoute(this, creator)
+    }
+
+    fun addPath(path: String){
+        super.paths.add(path)
     }
 }

@@ -3,6 +3,8 @@ package com.github.florent37.navigator
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,7 +21,7 @@ fun <C : AbstractFlavor<*>> Activity.invokeOnRouteFlavor(
     intenT.extras?.apply {
         try {
             val subRoute = getString(SUB_ROUTE_INTENT_KEY)
-            if (subRoute == configuration.name) {
+            if (subRoute == configuration.path) {
                 block(configuration)
             }
         } catch (t: Throwable) {
@@ -43,6 +45,14 @@ fun <F : AbstractFlavor<*>> FlavorBinder<F>.withBottomNav(bottomNav: BottomNavig
 fun <F : AbstractFlavor<*>> Activity.bindFlavor(flavor: F) = FlavorBinder<F>(this, this.intent, flavor)
 fun <F : AbstractFlavor<*>> Activity.bindFlavor(flavor: F, intent: Intent?) = FlavorBinder<F>(this, intent, flavor)
 
+fun <F : AbstractFlavor<*>> FlavorBinder<F>.withFragmentTransaction(
+    fragmentManager: FragmentManager,
+    block: FragmentTransaction.() -> FragmentTransaction
+) = this.also {
+    withAction {
+        block(fragmentManager.beginTransaction()).commitAllowingStateLoss()
+    }
+}
 
 fun Intent?.updateWith(newIntent: Intent?) : Intent? {
     return this?.apply {
