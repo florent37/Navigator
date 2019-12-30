@@ -3,6 +3,8 @@ package com.github.florent37.navigator
 import android.app.Activity
 import androidx.fragment.app.Fragment
 import com.github.florent37.navigator.exceptions.MissingRequiredParameter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.Serializable
 import kotlin.reflect.KProperty
 
@@ -13,8 +15,15 @@ open class Parameter : Serializable
  *
  * val args = routeParamValue<MyRoute.MyParam>
  */
-fun <T> Activity.routeParamValue(): T {
-    return this.intent.getSerializableExtra(ROUTE_ARGS_KEY) as T
+fun <T> Activity.routeParamValue(parameterClazz: Class<T>): T {
+    if(intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY)) {
+        return this.intent.getSerializableExtra(ROUTE_ARGS_KEY) as T
+    } else if(intent.hasExtra(ROUTE_KEY_STR_PARAMS)){
+        val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
+        return jsonString.fromJson(parameterClazz)
+    } else {
+        throw MissingRequiredParameter(parameterClazz.simpleName)
+    }
 }
 
 /**
@@ -22,8 +31,27 @@ fun <T> Activity.routeParamValue(): T {
  *
  * val args = flavorParamValue<MyRoute.MyParam>
  */
-fun <T> Activity.flavorParamValue(): T {
-    return this.intent.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as T
+fun <T> Activity.flavorParamValue(parameterClazz: Class<T>): T {
+    if(intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY)) {
+        return this.intent.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as T
+    } else if(intent.hasExtra(ROUTE_KEY_STR_PARAMS)){
+        val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
+        return jsonString.fromJson(parameterClazz)
+    } else {
+        throw MissingRequiredParameter(parameterClazz.simpleName)
+    }
+}
+
+var moshi : Moshi? = null
+
+internal fun <T> String.fromJson(clazz: Class<T>) : T {
+    if(moshi == null) {
+        moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+    }
+    val jsonAdapter = moshi!!.adapter<T>(clazz)
+    return jsonAdapter.fromJson(this) as T
 }
 
 /**
@@ -52,15 +80,15 @@ class ParameterDelegate<T : Parameter>(val parameterClazz: Class<T>, val flavor:
         // return value
         if (thisRef != null && thisRef is Activity) {
             return if (flavor) {
-                thisRef.flavorParamValue()
+                thisRef.flavorParamValue(parameterClazz)
             } else {
-                thisRef.routeParamValue()
+                thisRef.routeParamValue(parameterClazz)
             }
         } else if (thisRef != null && thisRef is Fragment && thisRef.activity != null) {
             return if (flavor) {
-                thisRef.activity!!.flavorParamValue()
+                thisRef.activity!!.flavorParamValue(parameterClazz)
             } else {
-                thisRef.activity!!.routeParamValue()
+                thisRef.activity!!.routeParamValue(parameterClazz)
             }
         }
         throw MissingRequiredParameter(parameterClazz.simpleName)

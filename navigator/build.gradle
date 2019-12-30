@@ -26,6 +26,7 @@ dependencies {
     implementation 'com.squareup.okio:okio:2.2.2'
 
     api "com.squareup.moshi:moshi:1.9.2"
+    api "com.squareup.moshi:moshi-kotlin:1.9.2"
 
     api 'com.google.android.material:material:1.0.0'
 }

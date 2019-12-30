@@ -6,11 +6,14 @@ import android.content.Intent
 import com.github.florent37.navigator.AllRoutes._allRoutes
 import com.github.florent37.navigator.exceptions.MissingFlavorImplementation
 import com.github.florent37.navigator.exceptions.MissingRouteImplementation
+import com.github.florent37.navigator.uri.PathMatcher
 
 internal const val ROUTE_ARGS_KEY = "__\$__ROUTE_ARGS_KEY__\$__"
 internal const val ROUTE_FLAVOR_ARGS_KEY = "__\$_ROUTE_FLAVOR_ARGS_KEY__\$__"
-internal const val ROUTE_INTENT_KEY = "__\$__NAVIGAROR_ROUTE_KEY__\$__"
-internal const val SUB_ROUTE_INTENT_KEY = "__\$__NAVIGAROR_SUB_ROUTE_KEY__\$__"
+internal const val ROUTE_INTENT_KEY = "__\$__NAVIGATOR_ROUTE_KEY__\$__"
+internal const val SUB_ROUTE_INTENT_KEY = "__\$__NAVIGATOR_SUB_ROUTE_KEY__\$__"
+
+internal const val ROUTE_KEY_STR_PARAMS = "__\$__ROUTE_STR_PARAMS__\$__"
 
 typealias INTENT_PARAMETER = (Intent) -> Unit
 
@@ -46,11 +49,11 @@ abstract class AbstractRoute(
     override val path: String
 ) : Destination {
 
-    protected val paths = mutableListOf<String>()
+    private val _pathMatchers = mutableListOf<PathMatcher>()
 
     init {
         _allRoutes.add(this)
-        paths.add(path)
+        addPath(path)
     }
 
     fun clear() {
@@ -63,7 +66,19 @@ abstract class AbstractRoute(
         }
     }
 
-    fun paths() = paths.toList()
+    fun register(creator: INTENT_CREATOR) {
+        Navigator.registerRoute(this, creator)
+    }
+
+    fun addPath(path: String) {
+        _pathMatchers.add(PathMatcher(path))
+    }
+
+    override val pathMatchers
+            get() = _pathMatchers.toMutableList()
+
+    override val paths
+            get() = pathMatchers.map { it.path }
 }
 
 /**
@@ -71,15 +86,7 @@ abstract class AbstractRoute(
  *
  * object MyRoute : Route("theAdress")
  */
-open class Route(path: String) : AbstractRoute(path) {
-    fun register(creator: INTENT_CREATOR) {
-        Navigator.registerRoute(this, creator)
-    }
-
-    fun addPath(path: String){
-        super.paths.add(path)
-    }
-}
+open class Route(path: String) : AbstractRoute(path)
 
 /**
  * A Route without parameter
@@ -89,12 +96,9 @@ open class Route(path: String) : AbstractRoute(path) {
  * }
  */
 open class RouteWithParams<P : Parameter>(path: String) : AbstractRoute(path) {
-
+    /*
     fun register(creator: (Context, P) -> Intent) {
         Navigator.registerRoute(this, creator)
     }
-
-    fun addPath(path: String){
-        super.paths.add(path)
-    }
+     */
 }

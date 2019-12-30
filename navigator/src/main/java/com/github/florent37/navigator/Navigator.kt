@@ -8,9 +8,9 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import com.github.florent37.application.provider.ActivityProvider
 import com.github.florent37.navigator.exceptions.AlreadyRegisteredException
+import com.github.florent37.navigator.starter.DesintationWithParams
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
-import com.github.florent37.navigator.uri.PathMatcher
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
@@ -20,16 +20,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 typealias INTENT_CREATOR = (Context) -> Intent
-typealias INTENT_CREATOR_WITH_PARAM = (Context, Parameter) -> Intent
-typealias INTENT_CREATOR_WITH_TWO_PARAM = (Context, Parameter, Parameter) -> Intent
 
-sealed class Routing {
-    class IntentCreator(val creator: INTENT_CREATOR) : Routing()
-    class IntentCreatorWithParams(val creator: INTENT_CREATOR_WITH_PARAM) : Routing()
-    class IntentFlavorCreatorWithRouteParams(
-        val creator: INTENT_CREATOR_WITH_TWO_PARAM
-    ) : Routing()
-}
+class Routing(val creator: INTENT_CREATOR)
 
 class RouteListener {
     private val route = Stack<Destination>()
@@ -129,7 +121,7 @@ object Navigator {
         if (routing.containsKey(route)) {
             throw AlreadyRegisteredException(route.path)
         } else {
-            routing[route] = Routing.IntentCreator(creator)
+            routing[route] = Routing(creator)
         }
     }
 
@@ -137,19 +129,6 @@ object Navigator {
         routing.remove(destination)
     }
 
-    /**
-     * Used by routes, register a route to an intent creator (with params)
-     */
-    fun <P : Parameter> registerRoute(
-        route: RouteWithParams<P>,
-        creator: (Context, P) -> Intent
-    ) {
-        if (routing.containsKey(route)) {
-            throw AlreadyRegisteredException(route.path)
-        } else {
-            routing[route] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
-        }
-    }
 
     /**
      * Used by flavors, register a flavor to an intent creator
@@ -158,37 +137,7 @@ object Navigator {
         if (routing.containsKey(flavor)) {
             throw AlreadyRegisteredException(flavor.path)
         } else {
-            routing[flavor] = Routing.IntentCreator(creator)
-        }
-    }
-
-    /**
-     * Used by flavors, register a flavor (of a non parameterized route) to an intent creator (with params)
-     */
-    fun <R : Route, P : Parameter> registerRoute(
-        flavor: FlavorWithParams<R, P>,
-        creator: (Context, P) -> Intent
-    ) {
-        if (routing.containsKey(flavor)) {
-            throw AlreadyRegisteredException(flavor.path)
-        } else {
-            routing[flavor] = Routing.IntentCreatorWithParams(creator as INTENT_CREATOR_WITH_PARAM)
-        }
-    }
-
-    /**
-     * Used by flavors, register a flavor (of a parameterized route) to an intent creator (with params)
-     */
-    @Throws(AlreadyRegisteredException::class)
-    fun <RP : Parameter, R : RouteWithParams<RP>, P : Parameter> registerRoute(
-        flavor: FlavorWithParams<R, P>,
-        creator: (Context, RP, P) -> Intent
-    ) {
-        if (routing.containsKey(flavor)) {
-            throw AlreadyRegisteredException(flavor.path)
-        } else {
-            routing[flavor] =
-                Routing.IntentFlavorCreatorWithRouteParams(creator as INTENT_CREATOR_WITH_TWO_PARAM)
+            routing[flavor] = Routing(creator)
         }
     }
 
@@ -262,8 +211,6 @@ object Navigator {
             val route = it.key
             if (it.key.path == path) {
                 return route
-            } else if (PathMatcher(it.key.path).matches(path) == true) {
-                return route
             }
         }
         return null
@@ -285,6 +232,22 @@ object Navigator {
 
     fun hasImplementation(destination: Destination): Boolean {
         return routing.containsKey(destination)
+    }
+
+    fun findDestinationWithParams(path: String) : DesintationWithParams? {
+        for ((destination, routing) in routing) {
+            destination.pathMatchers.forEach { pathMatcher ->
+                if(pathMatcher.matches(url= path)){
+                    val parametersValues = pathMatcher.parametersValues(url= path)
+                    return DesintationWithParams(
+                        destination = destination,
+                        params = parametersValues,
+                        routing= routing
+                    )
+                }
+            }
+        }
+        return null
     }
 
 }

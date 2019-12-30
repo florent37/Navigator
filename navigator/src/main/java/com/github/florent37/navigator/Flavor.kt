@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.github.florent37.navigator.AllFlavors._allFlavors
 import com.github.florent37.navigator.exceptions.MissingFlavorImplementation
+import com.github.florent37.navigator.uri.PathMatcher
 
 object AllFlavors {
     internal val _allFlavors = mutableListOf<AbstractFlavor<*>>()
@@ -31,19 +32,37 @@ abstract class AbstractFlavor<R : AbstractRoute>(
     val route: R,
     override val path: String
 ) : Destination {
+
+    private val _pathMatchers = mutableListOf<PathMatcher>()
+
     inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
         Navigator.registerRoute(this) { context ->
             Intent(context, T::class.java).also { intentParameter?.invoke(it) }
         }
     }
 
+    fun register(creator: INTENT_CREATOR) {
+        Navigator.registerRoute(this, creator)
+    }
+
     init {
         _allFlavors.add(this)
+        addPath(path)
+    }
+
+    fun addPath(path: String) {
+        _pathMatchers.add(PathMatcher(path))
     }
 
     fun clear() {
         Navigator.clearRoute(this)
     }
+
+    override val pathMatchers
+        get() = _pathMatchers.toMutableList()
+
+    override val paths
+        get() = pathMatchers.map { it.path }
 }
 
 /**
@@ -56,11 +75,7 @@ abstract class AbstractFlavor<R : AbstractRoute>(
 abstract class Flavor<R : AbstractRoute>(
     route: R,
     name: String
-) : AbstractFlavor<R>(route, name) {
-    fun register(creator: INTENT_CREATOR) {
-        Navigator.registerRoute(this, creator)
-    }
-}
+) : AbstractFlavor<R>(route, name)
 
 /**
  * A Flavor with parameter
