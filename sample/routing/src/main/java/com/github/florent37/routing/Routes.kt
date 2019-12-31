@@ -11,11 +11,11 @@ object Routes {
         object UserTabs : Flavor<Home>(this,"/tabUsers")
 
         object PostsTabs : FlavorWithParams<Home, PostsTabs.Params>(this,"/tabPosts/{userId}") {
-            class Params(@Json(name= "userId") val userId: Int?) : Parameter()
+            data class Params(@Json(name= "userId") val userId: Int?) : Parameter()
         }
     }
 
     object User : RouteWithParams<User.Params>("/user/{id}") {
-        class Params(@Json(name= "id") val userId: Int) : Parameter()
+        data class Params(@Json(name= "id") val userId: Int) : Parameter()
     }
 }
