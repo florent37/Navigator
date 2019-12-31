@@ -299,25 +299,32 @@ class NavigatorStarter(
         return containRoute
     }
 
-    fun push(path: String) {
+    fun push(path: String) : Boolean {
         return pushInternal(path = path)
     }
 
-    fun pushForResult(path: String, resultCode: Int) {
+    fun pushReplacement(path: String) : Boolean {
+        return pushInternal(path = path)
+    }
+
+    fun pushForResult(path: String, resultCode: Int) : Boolean  {
         return pushInternal(path = path, resultCode = resultCode)
     }
 
-    private fun pushInternal(path: String, resultCode: Int? = null) {
+    private fun pushInternal(path: String, resultCode: Int? = null, finishActivity: Boolean = false) : Boolean {
         //try to find by name
         Navigator.findDestination(path = path)?.let { destination ->
             when (destination) {
                 is Route -> {
+                    if(finishActivity) pushReplacement(destination)
                     push(destination)
-                    return
+                    return true
                 }
                 is Flavor<*> -> {
                     push(destination)
-                    return
+                    //if(finishActivity) pushReplacement(destination)
+                    //else push(destination)
+                    return true
                 }
                 else -> { /* nothing to do */
                 }
@@ -327,17 +334,18 @@ class NavigatorStarter(
         Navigator.findDestinationWithParams(path = path)?.let {
             pushWithParamsInternal(
                 destinationWithParams = it,
-                resultCode = resultCode
+                resultCode = resultCode,
+                finishActivity = finishActivity
             )
-            return
+            return true
         }
-
-        throw PathNotFound(path)
+        return false
     }
 
     private fun pushWithParamsInternal(
         destinationWithParams: DesintationWithParams,
-        resultCode: Int? = null
+        resultCode: Int? = null,
+        finishActivity: Boolean = false
     ): Boolean {
         val context = starterHandler.context ?: return false
         val destination = destinationWithParams.destination
@@ -368,6 +376,10 @@ class NavigatorStarter(
                 starterHandler.start(intent)
             } else {
                 starterHandler.startForResult(intent, resultCode)
+            }
+
+            if(finishActivity){
+                starterHandler.activity?.finish()
             }
         }
 
