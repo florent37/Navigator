@@ -96,7 +96,7 @@ abstract class Flavor<R : AbstractRoute>(
  *      }
  * }
  */
-abstract class FlavorWithParams<R : AbstractRoute, P : Parameter>(
+abstract class FlavorWithParams<R : AbstractRoute, P : Param>(
     route: R,
     name: String
 ) : AbstractFlavor<R>(route, name)

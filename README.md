@@ -47,8 +47,8 @@ object Routes {
     
     object Home : Route("/home")
     
-    object User : RouteWithParams<UserParams>("/user") {
-        class UserParams(val userId: String) : Params
+    object User : RouteWithParams<UserParams>("/user/{userId}") {
+        class UserParams(val userId: String) : Param
     }
 }
 ```
@@ -96,6 +96,13 @@ You can push a route from an activity (or fragment) using
 Navigator.of(this).push(Routes.Home)
 ```
 
+or by its path
+
+```kotlin
+Navigator.of(this).push("/home/")
+```
+
+
 ![Push](./medias/splash_push.png)
 
 You can also change the route from anywhere (eg: an android ViewModel) using `Navigator.current()`
@@ -122,6 +129,13 @@ class UserActivity : Activity {
     
         val userId = args.userId
 ```
+
+You can also call it by path's params
+```kotlin
+Navigator.of(this).push("/user/3")
+```
+
+It will use [moshi](https://github.com/square/moshi) to create the parameter from path params
 
 ## Pop
 

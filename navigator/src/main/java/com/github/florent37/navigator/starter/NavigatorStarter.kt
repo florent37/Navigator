@@ -44,7 +44,7 @@ class NavigatorStarter(
         }
     }
 
-    fun <P : Parameter, T : RouteWithParams<P>> push(
+    fun <P : Param, T : RouteWithParams<P>> push(
         route: T,
         arguments: P,
         intentConfig: IntentConfig? = null
@@ -61,7 +61,7 @@ class NavigatorStarter(
         return success
     }
 
-    fun <P : Parameter, T : RouteWithParams<P>> pushReplacement(
+    fun <P : Param, T : RouteWithParams<P>> pushReplacement(
         route: T,
         arguments: P,
         intentConfig: IntentConfig? = null
@@ -95,7 +95,7 @@ class NavigatorStarter(
         return success
     }
 
-    fun <P : Parameter, T : RouteWithParams<P>> pushForResult(
+    fun <P : Param, T : RouteWithParams<P>> pushForResult(
         route: T,
         resultCode: Int,
         arguments: P,
@@ -121,7 +121,7 @@ class NavigatorStarter(
         destination: T,
         resultCode: Int? = null,
         intentConfig: IntentConfig? = null,
-        routeParameter: Parameter? = null,
+        routeParameter: Param? = null,
         finishActivity: Boolean = false
     ): Boolean {
         val containRoute = routing.containsKey(destination)
@@ -176,7 +176,7 @@ class NavigatorStarter(
         return success
     }
 
-    fun <FR : Parameter, ROUTE : Route, F : FlavorWithParams<ROUTE, FR>> push(
+    fun <FR : Param, ROUTE : Route, F : FlavorWithParams<ROUTE, FR>> push(
         routeConfiguration: F,
         arguments: FR,
         intentConfig: IntentConfig? = null
@@ -193,7 +193,7 @@ class NavigatorStarter(
         return success
     }
 
-    fun <FR : Parameter, RP : Parameter, ROUTE : RouteWithParams<RP>, F : FlavorWithParams<ROUTE, FR>> push(
+    fun <FR : Param, RP : Param, ROUTE : RouteWithParams<RP>, F : FlavorWithParams<ROUTE, FR>> push(
         routeConfiguration: F,
         routeArguments: RP,
         arguments: FR,
@@ -228,7 +228,7 @@ class NavigatorStarter(
         return success
     }
 
-    fun <R : Parameter, T : FlavorWithParams<*, R>> pushForResult(
+    fun <R : Param, T : FlavorWithParams<*, R>> pushForResult(
         route: T,
         resultCode: Int,
         arguments: R,
@@ -255,8 +255,8 @@ class NavigatorStarter(
         routeConfiguration: T,
         resultCode: Int? = null,
         intentConfig: IntentConfig? = null,
-        routeParameters: Parameter? = null,
-        flavorParameters: Parameter? = null
+        routeParameters: Param? = null,
+        flavorParameters: Param? = null
     ): Boolean {
 
         val destination = routeConfiguration.route

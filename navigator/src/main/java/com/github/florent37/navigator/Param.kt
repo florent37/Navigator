@@ -8,7 +8,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.Serializable
 import kotlin.reflect.KProperty
 
-open class Parameter : Serializable
+open class Param : Serializable
 
 /**
  * Retrieve a non nullable route Parameter
@@ -102,7 +102,7 @@ fun <T> Activity.optionalFlavorParamValue(parameterClazz: Class<T>): T? {
     }
 }
 
-class ParameterDelegate<T : Parameter>(val parameterClazz: Class<T>, val flavor: Boolean = false) {
+class ParameterDelegate<T : Param>(val parameterClazz: Class<T>, val flavor: Boolean = false) {
     operator fun getValue(
         thisRef: Any?,
         property: KProperty<*>
@@ -132,7 +132,7 @@ class ParameterDelegate<T : Parameter>(val parameterClazz: Class<T>, val flavor:
     }
 }
 
-class OptionalParameterDelegate<T : Parameter>(
+class OptionalParameterDelegate<T : Param>(
     val parameterClazz: Class<T>,
     val flavor: Boolean = false
 ) {
@@ -175,7 +175,7 @@ class OptionalParameterDelegate<T : Parameter>(
  *
  * val args : MyRoute.MyParam by parameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Activity.parameter() =
+inline fun <reified T : Param> Activity.parameter() =
     ParameterDelegate(parameterClazz = T::class.java)
 
 /**
@@ -183,7 +183,7 @@ inline fun <reified T : Parameter> Activity.parameter() =
  *
  * val args : MyRoute.MyParam? by parameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Activity.optionalParameter() =
+inline fun <reified T : Param> Activity.optionalParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java)
 
 /**
@@ -191,7 +191,7 @@ inline fun <reified T : Parameter> Activity.optionalParameter() =
  *
  * val args : MyRoute.MyParam by parameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Fragment.routeParameter() =
+inline fun <reified T : Param> Fragment.routeParameter() =
     ParameterDelegate(parameterClazz = T::class.java, flavor = false)
 
 /**
@@ -199,7 +199,7 @@ inline fun <reified T : Parameter> Fragment.routeParameter() =
  *
  * val args : MyRoute.MyParam? by parameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Fragment.optionalRouteParameter() =
+inline fun <reified T : Param> Fragment.optionalRouteParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java, flavor = false)
 
 
@@ -208,7 +208,7 @@ inline fun <reified T : Parameter> Fragment.optionalRouteParameter() =
  *
  * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Fragment.flavorParameter() =
+inline fun <reified T : Param> Fragment.flavorParameter() =
     ParameterDelegate(parameterClazz = T::class.java, flavor = true)
 
 /**
@@ -216,7 +216,7 @@ inline fun <reified T : Parameter> Fragment.flavorParameter() =
  *
  * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Fragment.optionalFlavorParameter() =
+inline fun <reified T : Param> Fragment.optionalFlavorParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java, flavor = true)
 
 /**
@@ -224,7 +224,7 @@ inline fun <reified T : Parameter> Fragment.optionalFlavorParameter() =
  *
  * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Activity.flavorParameter() =
+inline fun <reified T : Param> Activity.flavorParameter() =
     ParameterDelegate(parameterClazz = T::class.java, flavor = true)
 
 /**
@@ -232,7 +232,7 @@ inline fun <reified T : Parameter> Activity.flavorParameter() =
  *
  * val args : MyRoute.MyParam by flavorParameter<MyRoute.MyParam>()
  */
-inline fun <reified T : Parameter> Activity.optionalFlavorParameter() =
+inline fun <reified T : Param> Activity.optionalFlavorParameter() =
     OptionalParameterDelegate(parameterClazz = T::class.java, flavor = true)
 
 

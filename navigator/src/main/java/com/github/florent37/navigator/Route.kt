@@ -1,7 +1,6 @@
 package com.github.florent37.navigator
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import com.github.florent37.navigator.AllRoutes._allRoutes
 import com.github.florent37.navigator.exceptions.MissingFlavorImplementation
@@ -99,7 +98,7 @@ open class Route(path: String) : AbstractRoute(path)
  *  class ParameterClass(val param1: Int, val param2: String) : Param
  * }
  */
-open class RouteWithParams<P : Parameter>(path: String) : AbstractRoute(path) {
+open class RouteWithParams<P : Param>(path: String) : AbstractRoute(path) {
     /*
     fun register(creator: (Context, P) -> Intent) {
         Navigator.registerRoute(this, creator)
