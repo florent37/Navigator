@@ -74,6 +74,10 @@ abstract class AbstractRoute(
         _pathMatchers.add(PathMatcher(path))
     }
 
+    fun removePath(path: String) {
+        _pathMatchers.removeAll { it.path == path }
+    }
+
     override val pathMatchers
             get() = _pathMatchers.toMutableList()
 

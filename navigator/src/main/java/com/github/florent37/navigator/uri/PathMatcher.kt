@@ -2,9 +2,7 @@ package com.github.florent37.navigator.uri;
 
 import java.util.regex.Pattern
 
-class PathMatcher constructor(
-    val path: String
-) {
+class PathMatcher(val path: String) {
 
     companion object {
         private const val PARAM = "([a-zA-Z][a-zA-Z0-9_-]*)"
@@ -23,9 +21,7 @@ class PathMatcher constructor(
             PARAM_REGEX.toRegex(),
             PARAM_VALUE
         )
-
         this.pathParams = path.valuesOf(PARAM_PATTERN)
-
         regex = Pattern.compile("^$pathReplaced\$")
     }
 

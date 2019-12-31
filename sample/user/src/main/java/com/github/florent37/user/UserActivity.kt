@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.github.florent37.navigator.Navigator
 import com.github.florent37.navigator.parameter
 import com.github.florent37.routing.Routes
+import com.squareup.moshi.Json
 import kotlinx.android.synthetic.main.activity_user.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -28,7 +29,8 @@ class UserActivity : AppCompatActivity() {
         })
 
         goToPosts.setOnClickListener {
-            Navigator.of(this).push(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId = args.userId))
+            Navigator.of(this).push("/home/tabPosts/${args.userId}")
+            //Navigator.of(this).push(Routes.Home.PostsTabs, Routes.Home.PostsTabs.Params(userId = args.userId))
         }
     }
 }

@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import com.github.florent37.application.provider.ActivityProvider
 import com.github.florent37.navigator.exceptions.AlreadyRegisteredException
+import com.github.florent37.navigator.exceptions.MissingRouteImplementation
 import com.github.florent37.navigator.starter.DesintationWithParams
 import com.github.florent37.navigator.starter.NavigatorStarter
 import com.github.florent37.navigator.starter.StarterHandler
@@ -235,12 +236,27 @@ object Navigator {
     }
 
     fun findDestinationWithParams(path: String) : DesintationWithParams? {
+        //try with routes
         for ((destination, routing) in routing) {
             destination.pathMatchers.forEach { pathMatcher ->
                 if(pathMatcher.matches(url= path)){
                     val parametersValues = pathMatcher.parametersValues(url= path)
                     return DesintationWithParams(
                         destination = destination,
+                        params = parametersValues,
+                        routing= routing
+                    )
+                }
+            }
+        }
+        //try with flavors
+        for (flavor in AllFlavors.allFlavors) {
+            flavor.pathMatchers.forEach { pathMatcher ->
+                if(pathMatcher.matches(url= path)){
+                    val routing = routing[flavor.route] ?: throw MissingRouteImplementation(flavor.route.path)
+                    val parametersValues = pathMatcher.parametersValues(url= path)
+                    return DesintationWithParams(
+                        destination = flavor,
                         params = parametersValues,
                         routing= routing
                     )

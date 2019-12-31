@@ -28,12 +28,17 @@ object AllFlavors {
  * `TheFlavor.registerActivity<MyActivity>()`
  */
 @Suppress("LeakingThis")
-abstract class AbstractFlavor<R : AbstractRoute>(
-    val route: R,
-    override val path: String
-) : Destination {
+abstract class AbstractFlavor<R : AbstractRoute>(val route: R, path: String) : Destination {
 
-    private val _pathMatchers = mutableListOf<PathMatcher>()
+    override val path: String = if(path.startsWith(route.path)){
+        path
+    } else {
+        val routePath = if(route.path.endsWith("/")) route.path.substring(startIndex = 0, endIndex = route.path.length-1) else route.path
+        val flavorPath = if(path.startsWith("/")) path else "/$path"
+        routePath + flavorPath
+    }
+
+    private val _pathMatchers: MutableList<PathMatcher> = mutableListOf()
 
     inline fun <reified T : Activity> registerActivity(noinline intentParameter: INTENT_PARAMETER? = null) {
         Navigator.registerRoute(this) { context ->
@@ -41,17 +46,21 @@ abstract class AbstractFlavor<R : AbstractRoute>(
         }
     }
 
+    init {
+        _allFlavors.add(this)
+        addPath(this.path)
+    }
+
     fun register(creator: INTENT_CREATOR) {
         Navigator.registerRoute(this, creator)
     }
 
-    init {
-        _allFlavors.add(this)
-        addPath(path)
-    }
-
     fun addPath(path: String) {
         _pathMatchers.add(PathMatcher(path))
+    }
+
+    fun removePath(path: String) {
+        _pathMatchers.removeAll { it.path == path }
     }
 
     fun clear() {
@@ -63,6 +72,7 @@ abstract class AbstractFlavor<R : AbstractRoute>(
 
     override val paths
         get() = pathMatchers.map { it.path }
+
 }
 
 /**

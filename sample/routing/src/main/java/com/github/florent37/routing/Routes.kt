@@ -8,10 +8,10 @@ object Routes {
     object Splash : Route("/")
 
     object Home : Route("/home/") {
-        object UserTabs : Flavor<Home>(this,"$path/tabUsers")
+        object UserTabs : Flavor<Home>(this,"/tabUsers")
 
-        object PostsTabs : FlavorWithParams<Home, PostsTabs.Params>(this,"$path/tabPosts") {
-            class Params(val userId: Int?) : Parameter()
+        object PostsTabs : FlavorWithParams<Home, PostsTabs.Params>(this,"/tabPosts/{userId}") {
+            class Params(@Json(name= "userId") val userId: Int?) : Parameter()
         }
     }
 

@@ -16,13 +16,17 @@ open class Parameter : Serializable
  * val args = routeParamValue<MyRoute.MyParam>
  */
 fun <T> Activity.routeParamValue(parameterClazz: Class<T>): T {
-    if(intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY)) {
-        return this.intent.getSerializableExtra(ROUTE_ARGS_KEY) as T
-    } else if(intent.hasExtra(ROUTE_KEY_STR_PARAMS)){
-        val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
-        return jsonString.fromJson(parameterClazz)
-    } else {
-        throw MissingRequiredParameter(parameterClazz.simpleName)
+    return when {
+        intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY) -> {
+            this.intent.getSerializableExtra(ROUTE_ARGS_KEY) as T
+        }
+        intent.hasExtra(ROUTE_KEY_STR_PARAMS) -> {
+            val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
+            jsonString.fromJson(parameterClazz)
+        }
+        else -> {
+            throw MissingRequiredParameter(parameterClazz.simpleName)
+        }
     }
 }
 
@@ -32,17 +36,21 @@ fun <T> Activity.routeParamValue(parameterClazz: Class<T>): T {
  * val args = flavorParamValue<MyRoute.MyParam>
  */
 fun <T> Activity.flavorParamValue(parameterClazz: Class<T>): T {
-    if(intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY)) {
-        return this.intent.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as T
-    } else if(intent.hasExtra(ROUTE_KEY_STR_PARAMS)){
-        val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
-        return jsonString.fromJson(parameterClazz)
-    } else {
-        throw MissingRequiredParameter(parameterClazz.simpleName)
+    return when {
+        intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY) -> {
+            this.intent.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as T
+        }
+        intent.hasExtra(ROUTE_KEY_STR_PARAMS) -> {
+            val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
+            jsonString.fromJson(parameterClazz)
+        }
+        else -> {
+            throw MissingRequiredParameter(parameterClazz.simpleName)
+        }
     }
 }
 
-var moshi : Moshi? = null
+internal var moshi : Moshi? = null
 
 internal fun <T> String.fromJson(clazz: Class<T>) : T {
     if(moshi == null) {
@@ -59,8 +67,19 @@ internal fun <T> String.fromJson(clazz: Class<T>) : T {
  *
  * val args  : MyRoute.MyParam? = optionalRouteParamValue<MyRoute.MyParam>
  */
-fun <T> Activity.optionalRouteParamValue(): T? {
-    return this.intent?.getSerializableExtra(ROUTE_ARGS_KEY) as? T
+fun <T> Activity.optionalRouteParamValue(parameterClazz: Class<T>): T? {
+    return when {
+        intent.hasExtra(ROUTE_ARGS_KEY) -> {
+            this.intent?.getSerializableExtra(ROUTE_ARGS_KEY) as? T
+        }
+        intent.hasExtra(ROUTE_KEY_STR_PARAMS) -> {
+            val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
+            jsonString.fromJson(parameterClazz)
+        }
+        else -> {
+            throw MissingRequiredParameter(parameterClazz.simpleName)
+        }
+    }
 }
 
 /**
@@ -68,8 +87,19 @@ fun <T> Activity.optionalRouteParamValue(): T? {
  *
  * val args : MyRoute.MyParam? = optionalFlavorParamValue<MyRoute.MyParam>
  */
-fun <T> Activity.optionalFlavorParamValue(): T? {
-    return this.intent?.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as? T
+fun <T> Activity.optionalFlavorParamValue(parameterClazz: Class<T>): T? {
+    return when {
+        intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY) -> {
+            this.intent?.getSerializableExtra(ROUTE_FLAVOR_ARGS_KEY) as? T
+        }
+        intent.hasExtra(ROUTE_KEY_STR_PARAMS) -> {
+            val jsonString = intent.getStringExtra(ROUTE_KEY_STR_PARAMS)
+            jsonString.fromJson(parameterClazz)
+        }
+        else -> {
+            throw MissingRequiredParameter(parameterClazz.simpleName)
+        }
+    }
 }
 
 class ParameterDelegate<T : Parameter>(val parameterClazz: Class<T>, val flavor: Boolean = false) {
@@ -114,15 +144,15 @@ class OptionalParameterDelegate<T : Parameter>(
             // return value
             return if (thisRef != null && thisRef is Activity) {
                 if (flavor) {
-                    thisRef.optionalFlavorParamValue<T>()
+                    thisRef.optionalFlavorParamValue<T>(parameterClazz)
                 } else {
-                    thisRef.optionalRouteParamValue<T>()
+                    thisRef.optionalRouteParamValue<T>(parameterClazz)
                 }
             } else if (thisRef != null && thisRef is Fragment && thisRef.activity != null) {
                 if (flavor) {
-                    thisRef.activity?.optionalFlavorParamValue<T>()
+                    thisRef.activity?.optionalFlavorParamValue<T>(parameterClazz)
                 } else {
-                    thisRef.activity?.optionalRouteParamValue<T>()
+                    thisRef.activity?.optionalRouteParamValue<T>(parameterClazz)
                 }
             } else {
                 null
