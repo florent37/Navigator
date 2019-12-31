@@ -5,7 +5,7 @@ Android Multi-module navigator, trying to find a way to navigate into a modulari
 # Import
 
 ```groovy
-implementation "com.github.florent37:navigator:0.0.3"
+implementation "com.github.florent37:navigator:1.0.0"
 ```
 
 # Multi module sample
