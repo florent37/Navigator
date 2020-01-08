@@ -155,8 +155,6 @@ Navigator.current()?.pushReplacement(Routes.Splash)
 
 A flavor is an endpoint of a route, you can use them to navigate to an Activity's BottomNavigation item
 
-//explain this
-
 ```kotlin
 object Home : Route("/home/") {
      object UserTabs : Flavor<Home>(this,"home/tabUsers")
