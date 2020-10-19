@@ -17,7 +17,7 @@ open class Param : Serializable
  */
 fun <T> Activity.routeParamValue(parameterClazz: Class<T>): T {
     return when {
-        intent.hasExtra(ROUTE_FLAVOR_ARGS_KEY) -> {
+        intent.hasExtra(ROUTE_ARGS_KEY) -> {
             this.intent.getSerializableExtra(ROUTE_ARGS_KEY) as T
         }
         intent.hasExtra(ROUTE_KEY_STR_PARAMS) -> {
